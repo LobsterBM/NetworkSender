@@ -3,7 +3,7 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <errno.h>
-
+#include <stdlib.h>
 
 
 typedef struct Paquet Paquet;
@@ -26,81 +26,94 @@ struct Buffer
 {
 	
 	unsigned int c : 32;
-	unsigned int d : 32;
+	long *content;
 };
 
 
+
+
 //fonctions définies
-void structToBuff(Paquet t, Buffer *b);
+void structToBuff(Paquet p, Buffer *b);
 void buffToStruct(Paquet *p, Buffer b);
 void display(Paquet p);
 //fin
 
 
 
-int main(int argc, char *argv[] ) {
-
-   
-   //début test d'encodage 
-    Buffer buff;
-	Paquet p;
-	p.type = 2;
-	p.TR = 0;
-	p.window = 10;
-	p.L = 0;
-	p.length7 = 46;
-	p.Seqnum = 198;
-
-	structToBuff(p,&buff);
-	
-
-	//décodage
-	Paquet p2;
-	buffToStruct(&p2,buff);
-	display(p2);
+int main (int argc, char **argv){
 
 
-    return 0;
-}
+Buffer buff;
+buff.content = malloc(150);
+if(buff.content==NULL){printf("Le malloc a échoué\n");}
 
-//buffer needs to be 32-bits
+//printf("Size of content: %d\n", (int)sizeof(*(buff.content)));
+
+Paquet p,p2;
+p.type = 2;
+p.TR = 0;
+p.window = 10;
+p.L = 0;
+p.length7 = 46;
+p.Seqnum = 198;
+p.Timestamp = 188632383;
+
+
+
+
+structToBuff(p,&buff);
+buffToStruct(&p2,buff);
+display(p2);
+
+
+
+
+
+return 0;}
+
 void structToBuff(Paquet p, Buffer *b){
 	
-	(*b).c = 0;
+	*((*b).content)  = 0;
 	
 
 	//printf("step 1:%u\n",b.c );
-	(*b).c = (*b).c | p.type;
+	*((*b).content)= *((*b).content) | p.type;
 	//printf("step 2:%u\n",b.c );
-	(*b).c = (*b).c << 1;
-	(*b).c = (*b).c | p.TR;
+	*((*b).content)= *((*b).content) << 1;
+	*((*b).content)= *((*b).content) | p.TR;
 	//printf("step 3:%u\n",b.c );//ok jusqu'ici
-	(*b).c = (*b).c << 5;
-	(*b).c = (*b).c | p.window;
+	*((*b).content) = *((*b).content)  << 5;
+	*((*b).content)  = *((*b).content)  | p.window;
 	//printf("step 4:%u\n",b.c );
-	(*b).c = (*b).c << 1;
-	(*b).c = (*b).c | p.L;
+	*((*b).content)  = *((*b).content)  << 1;
+	*((*b).content)  = *((*b).content) | p.L;
 	//printf("step 5:%u\n",b.c );//ok
 	if(p.L==0){
-		(*b).c = (*b).c << 7;
-		(*b).c = (*b).c | p.length7;
-		(*b).c = (*b).c << 8;
+		*((*b).content)  = *((*b).content) << 7;
+		*((*b).content)  = *((*b).content) | p.length7;
+		*((*b).content)  = *((*b).content) << 8;
 	}
 	else{
-		(*b).c = (*b).c << 15;
-		(*b).c = (*b).c | p.length15;
+		*((*b).content) = *((*b).content)  << 15;
+		*((*b).content)  = *((*b).content)  | p.length15;
 	}
-	(*b).c = (*b).c << 8;
-	(*b).c = (*b).c | p.Seqnum;
+	*((*b).content)  = *((*b).content) << 8;
+	*((*b).content)  = *((*b).content)  | p.Seqnum;
+
+	/*
+	*((*b).content)  = *((*b).content) << 32;
+	*((*b).content)  = *((*b).content)  | p.Timestamp;
+	*/
 
 
 	
 
-	//printf("final step:%u\n",(*b).c );
+	//printf("final step:%u\n",*((*b).content));
 
 
 	
 }
+
 
 void buffToStruct(Paquet *p, Buffer b){
 	//init à 0
@@ -111,43 +124,50 @@ void buffToStruct(Paquet *p, Buffer b){
 	(*p).length7=0;
 	(*p).length15=0;
 	(*p).Seqnum=0;
+	(*p).Timestamp=0;
 
 	//copy de b.c et shift le bit L au bord(droit) de copy 
-	uint32_t copy=b.c;
+	uint32_t copy=*(b.content) ;
 	copy= copy >> 23;
 	
 
 	//coeur de methode
-	(*p).Seqnum = (*p).Seqnum | b.c;
-	b.c=b.c>>8;
+	/*	
+	(*p).Timestamp = (*p).Timestamp | *(b.content);
+	*(b.content) =*(b.content)>>32;
+	*/
+
+	(*p).Seqnum = (*p).Seqnum | *(b.content);
+	*(b.content) =*(b.content)>>8;
 
 	//si  L==0
 	if(copy%2 == 0){
 		(*p).L = 0;
-		b.c=b.c>>8;
-		(*p).length7 = (*p).length7 | b.c;
-		b.c=b.c>>8;
+		*(b.content) =*(b.content) >>8;
+		(*p).length7 = (*p).length7 | *(b.content);
+		*(b.content) =*(b.content)>>8;
 	}
 	//si L!=0
 	else {
 		(*p).L = 1;
-		(*p).length15 = (*p).length15 | b.c;
-		b.c=b.c>>16;
+		(*p).length15 = (*p).length15 | *(b.content);
+		*(b.content) =*(b.content) >>16;
 	}
 	
-	(*p).window = (*p).window | b.c;
-	b.c=b.c>>5;
+	(*p).window = (*p).window | *(b.content);
+	*(b.content)=*(b.content) >>5;
 
-	(*p).TR = (*p).TR | b.c;
-	b.c=b.c>>1;
+	(*p).TR = (*p).TR |*(b.content);
+	*(b.content) =*(b.content) >>1;
 
-	(*p).type = (*p).type | b.c;
+	(*p).type = (*p).type | *(b.content);
 	
 
 
 
 
 }
+
 
 
 
@@ -166,5 +186,6 @@ void display(Paquet p){
 	}
 	
 	printf("Seqnum : %u\n",p.Seqnum);
+	printf("Timestamp : %u\n",p.Timestamp);
 
 }
