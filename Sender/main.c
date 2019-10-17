@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
-char * filename;
+char * filename = NULL;
 char * address;
 int port ;
+FILE *file;
 
 int argReader(int argc, char *argv[]){
     //TODO argument arror check
@@ -16,17 +18,26 @@ int argReader(int argc, char *argv[]){
         else{
             address = argv[i];
             i++; //port numer
-            port = argv[i];
+            port = atoi(argv[i]);
+            i = argc;
         }
     }
+    if (filename == NULL){
+        file = stdin;
+    }
+    else{
+        file = file = fopen(filename , "rb");
+        //TODO errror check
+    }
+
 
 }
 
-int getPayload(char * payload, FILE * file){
+int getPayload(char * payload, FILE * file, int byteRead){
 
-    memset(payload, 0, sizeof(char)*64);
+    memset(payload, 0, sizeof(char)*byteRead);
 
-   ssize_t bytesRead = fread(payload, sizeof(char), 64 , file);
+   ssize_t bytesRead = fread(payload, sizeof(char), byteRead, file);
    if (bytesRead == 0){
        //TODO error
    }
@@ -39,6 +50,9 @@ int getPayload(char * payload, FILE * file){
 
 int main(int argc, char *argv[] ) {
 
+
+
+
     for(int i  = 1 ; i < argc ; i++){
         printf(argv[i]);
         printf("\n");
@@ -49,10 +63,6 @@ int main(int argc, char *argv[] ) {
 
     argReader(argc,argv);
 
-    FILE *file;
-    printf(filename);
-
-    file = fopen(filename , "rb");
 
 
     if(file == NULL){
@@ -60,17 +70,19 @@ int main(int argc, char *argv[] ) {
         return -1;
     }
 
-    char * payload[64] = {0};
+    char * payload[512] = {0};
 
-    for(int i = 0 ; i < 100 ; i++){
-        printf("\n");
+    for(int i = 0 ; i < 12 ; i++){
+        printf("\n\n\n\n");
 
-        getPayload(payload,file);
+        getPayload(payload,file, 512);
 
     }
 
 
 
+
     printf("\n");
+    printf("address is %s : %d \n", address ,port);
     return 0;
 }
