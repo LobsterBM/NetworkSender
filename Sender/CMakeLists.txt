@@ -3,4 +3,4 @@ project(Sender C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(Sender main.c)
+add_executable(Sender main.c client.c server.c)

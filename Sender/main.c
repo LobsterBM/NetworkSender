@@ -6,10 +6,13 @@
 #include <stdlib.h>
 
 
+typedef struct Buffer Buffer;
 typedef struct Paquet Paquet;
+
+
 struct Paquet
 {
-	 unsigned int type : 2;
+	 unsigned int type : 2; //ack nack data
 	 unsigned int TR : 1;
 	 unsigned int window: 5;
 	 unsigned int L : 1;
@@ -17,11 +20,9 @@ struct Paquet
 	 unsigned int length15: 15;
 	 unsigned int Seqnum: 8;
 	 unsigned int Timestamp: 32;
-	
+
 };
 
-
-typedef struct Buffer Buffer;
 struct Buffer
 {
 	
@@ -74,13 +75,15 @@ display(p2);
 
 return 0;}
 
-
+//TODO check structure in binary for during execution
 void structToBuff(Paquet p, Buffer *b){
 	
 	*((*b).content)  = 0;
+	//TODO memeset  sur la longueur  su buffer a 0
 	//printf("byte 1 step 1:%u\n",*((*b).content));
 
 	*((*b).content)= *((*b).content) | p.type;
+
 	//printf("byte 1 step 2:%u\n",*((*b).content) );
 	
 	*((*b).content)= *((*b).content) << 1;
@@ -102,7 +105,7 @@ void structToBuff(Paquet p, Buffer *b){
 	}
 	else{
 		//décomposition length15
-		uint8_t l1 =0;
+		uint8_t l1 =0; // 2 bytes makin:g up length , so 2 bytes
 		uint8_t l2 =0;
 		l2 =  p.length15 | l2;
 		p.length15 = p.length15 >> 8;

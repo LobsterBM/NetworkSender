@@ -78,7 +78,13 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/mnt/d/UCL/Bac3/Reseau/NetworkSender/Sender/client.c">
+			<Option target="Sender"/>
+		</Unit>
 		<Unit filename="/mnt/d/UCL/Bac3/Reseau/NetworkSender/Sender/main.c">
+			<Option target="Sender"/>
+		</Unit>
+		<Unit filename="/mnt/d/UCL/Bac3/Reseau/NetworkSender/Sender/server.c">
 			<Option target="Sender"/>
 		</Unit>
 		<Unit filename="/mnt/d/UCL/Bac3/Reseau/NetworkSender/Sender/CMakeLists.txt">
