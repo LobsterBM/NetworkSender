@@ -7,10 +7,13 @@
 #include <zlib.h>
 
 
+
+
 char * filename = NULL;
 char * address;
 int port ;
 FILE *file;
+uLong crc ;
 
 int argReader(int argc, char *argv[]){
     //TODO argument arror check
@@ -48,6 +51,7 @@ int getPayload(char * payload, FILE * file, int byteRead){
    }
    printf("bytes read : %d \n" , (int)bytesRead);
    printf(payload);
+   return bytesRead;
 
 }
 
@@ -89,8 +93,9 @@ void buffToStruct(Paquet *p, Buffer b);
 //fin
 
 
-char * packetGenerator ( Paquet p , char * payload){
-    //TODO TR 1 
+char * packetGenerator ( Paquet p , char * payload , int payloadLen){
+    //TODO TR 1 case
+
 
 	char *packet[64+512];
     //todo check packet size ?
@@ -103,9 +108,19 @@ char * packetGenerator ( Paquet p , char * payload){
         packet[i] = header[i];
     }
 
-    crc32();
+    crc  = crc32(crc , payload, payloadLen);
+    payload[32] = crc;
 
 
+
+
+    for (int i = 0 ; i < payloadLen; i++){
+    	packet[i+96] = payload[i];
+    	//98 for 64 header and 32 crc
+    }
+
+
+    return packet;
 
 
 
@@ -114,7 +129,34 @@ char * packetGenerator ( Paquet p , char * payload){
 
 int main (int argc, char **argv){
 
-    /*
+	crc = crc32(0L,Z_NULL,0);
+	//crc needs to be initialised at each startup
+
+	argReader(argc,argv);
+
+	char * payload[512] = {0};
+
+	int payLen = getPayload(payload, file, 512);
+
+
+	//init part
+	int sock = socket(AF_INET6,SOCK_DGRAM,0);
+	if(sock == -1 ){printf("Erreur lors de la création des sockets.\n");}
+
+	struct sockaddr_in6 peer_addr;                      // allocate the address on the stack
+	memset(&peer_addr, 0, sizeof(peer_addr));           // fill the address with 0-bytes to avoid garbage-values
+	peer_addr.sin6_family = AF_INET6;                   // indicate that the address is an IPv6 address
+	peer_addr.sin6_port = htons(port);                 // indicate that the programm is running on port 55555
+	inet_pton(AF_INET6, address, &peer_addr.sin6_addr);   // indicate that the program is running on the computer identified by the ::1 IPv6 address
+
+
+
+	//sending part
+	ssize_t sent=0;
+
+
+
+	/*
      *
 
     for(int i  = 1 ; i < argc ; i++){
@@ -134,7 +176,7 @@ int main (int argc, char **argv){
         return -1;
     }
 
-    char * payload[512] = {0};
+
 
     for(int i = 0 ; i < 12 ; i++){
         printf("\n\n\n\n");
@@ -152,36 +194,38 @@ int main (int argc, char **argv){
      */
 
 
-Buffer buff;
-buff.content = calloc(32,sizeof(char));
-if(buff.content==NULL){printf("Le malloc a échoué\n");}
+
+	Buffer buff;
+	buff.content = calloc(32,sizeof(char));
+	if(buff.content==NULL){printf("Le malloc a échoué\n");}
 
 //printf("Size of content: %d\n", (int)sizeof(*(buff.content)));
 
-Paquet p,p2;
-p.type = 2;
-p.TR = 0;
-p.window = 10;
-p.L = 1;
-p.length7 = 46;
-p.length15 = 29018;
-p.Seqnum = 198;
-p.Timestamp = 188632383;
+	Paquet p,p2;
+	p.type = 2;
+	p.TR = 0;
+	p.window = 10;
+	p.L = 1;
+	p.length7 = 46;
+	p.length15 = 29018;
+	p.Seqnum = 198;
+	p.Timestamp = 188632383;
+
+
+	char * finalbuffer;
+	finalbuffer = packetGenerator(p,payload,payLen);
+	sent = sendto(sock,finalbuffer,(payLen+64)*sizeof(char),0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
+
+	structToBuff(p,&buff);
+	buffToStruct(&p2,buff);
+	display(p2);
 
 
 
 
 
-structToBuff(p,&buff);
-buffToStruct(&p2,buff);
-display(p2);
 
-
-
-
-
-
-return 0;}
+	return 0;}
 
 //TODO check structure in binary for during execution
 void structToBuff(Paquet p, Buffer *b){
