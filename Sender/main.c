@@ -4,7 +4,7 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <stdlib.h>
-
+#include <zlib.h>
 
 
 char * filename = NULL;
@@ -89,6 +89,27 @@ void buffToStruct(Paquet *p, Buffer b);
 //fin
 
 
+char * packetGenerator ( Paquet p , char * payload){
+    //TODO TR 1 
+
+	char *packet[64+512];
+    //todo check packet size ?
+    char* header[64];
+    //todo variable header size
+    structToBuff(p,header);
+
+    //copy header to final packet
+    for(int i = 0 ; i < 32 ; i++){
+        packet[i] = header[i];
+    }
+
+    crc32();
+
+
+
+
+
+}
 
 
 int main (int argc, char **argv){
@@ -146,6 +167,7 @@ p.length7 = 46;
 p.length15 = 29018;
 p.Seqnum = 198;
 p.Timestamp = 188632383;
+
 
 
 

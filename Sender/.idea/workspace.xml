@@ -36,8 +36,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="634">
-              <caret line="129" column="13" selection-start-line="129" selection-start-column="13" selection-end-line="129" selection-end-column="13" />
+            <state relative-caret-position="289">
+              <caret line="92" column="16" selection-start-line="92" selection-start-column="16" selection-end-line="92" selection-end-column="16" />
+              <folding>
+                <element signature="e#1614#1632#0" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -144,7 +147,7 @@
       <option name="presentableId" value="Default" />
       <updated>1571053890380</updated>
       <workItem from="1571053892696" duration="3659000" />
-      <workItem from="1571558250737" duration="48000" />
+      <workItem from="1571558250737" duration="3877000" />
     </task>
     <task id="LOCAL-00001" summary="Clion commit test">
       <created>1571054062660</created>
@@ -164,7 +167,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="7680000" />
+    <option name="totallyTimeSpent" value="11509000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="848" extended-state="6" />
@@ -233,8 +236,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="634">
-          <caret line="129" column="13" selection-start-line="129" selection-start-column="13" selection-end-line="129" selection-end-column="13" />
+        <state relative-caret-position="289">
+          <caret line="92" column="16" selection-start-line="92" selection-start-column="16" selection-end-line="92" selection-end-column="16" />
+          <folding>
+            <element signature="e#1614#1632#0" />
+          </folding>
         </state>
       </provider>
     </entry>
