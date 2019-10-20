@@ -28,6 +28,7 @@ struct Buffer
 	
 	unsigned int c : 32;
 	unsigned char *content;
+	unsigned char *networkContent;
 };
 //fin structures
 
@@ -67,6 +68,8 @@ int main (int argc, char **argv){
 		Buffer buff;
 		buff.content = calloc(32,sizeof(char));
 		if(buff.content==NULL){printf("Le malloc a échoué\n");}
+		buff.networkContent = calloc(32,sizeof(char));
+		if(buff.networkContent==NULL){printf("Le malloc a échoué\n");}
 
 		//printf("Size of content: %d\n", (int)sizeof(*(buff.content)));
 
@@ -83,6 +86,7 @@ int main (int argc, char **argv){
 		structToBuff(p,&buff);
 		buffToStruct(&p2,buff);
 		display(p2);
+
 
 		sent = sendto(sock,buff.content,32*sizeof(char),0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
 	}
