@@ -162,7 +162,7 @@ Paquet p,p2;
 p.type = 2;
 p.TR = 0;
 p.window = 10;
-p.L = 0;
+p.L = 1;
 p.length7 = 46;
 p.length15 = 29018;
 p.Seqnum = 198;
@@ -206,12 +206,19 @@ void structToBuff(Paquet p, Buffer *b){
 	*((*b).content+1)  = *((*b).content+1) | p.L;
 	//printf("byte 2 setp 2:%u\n",*((*b).content+1));
 	
+	//i => indice de décalage (nom biz)
+	int i;
+
 	if(p.L==0){
-		*((*b).content+1)  = *((*b).content+1) << 7;
+		//*((*b).content+1)  = *((*b).content+1) << 7;
 		*((*b).content+1)  = *((*b).content+1) | p.length7;
 		//printf("byte 2 setp 3:%u\n",*((*b).content+1));
+		i=2;
+	
 	}
 	else{
+
+		i=3;
 		//décomposition length15
 		uint8_t l1 =0; // 2 bytes makin:g up length , so 2 bytes
 		uint8_t l2 =0;
@@ -224,39 +231,41 @@ void structToBuff(Paquet p, Buffer *b){
 		//encodage du length15
 		*((*b).content+1)  = *((*b).content+1)+128 | l1;
 		*((*b).content+2)  = *((*b).content+2) | l2;
+
+		
 	}
 
-	
-	*((*b).content+3)  = *((*b).content+3)  | p.Seqnum;
-	//printf("byte 4 setp 1:%u\n",*((*b).content+3));
+		//encodage Seqnum
+		*((*b).content+i)  = *((*b).content+i)  | p.Seqnum;
+		//printf("byte seqnum setp 1:%u\n",*((*b).content+i));
 
-	
-	//décomposition  du timestamp
-	uint8_t w =0;
-	uint8_t x =0;
-	uint8_t y =0;
-	uint8_t z =0;
+		
+		//décomposition  du timestamp
+		uint8_t w =0;
+		uint8_t x =0;
+		uint8_t y =0;
+		uint8_t z =0;
 
-	z=p.Timestamp |z;
-	p.Timestamp = p.Timestamp >> 8;
-	//printf("Décompo z = %u\n",z );
-	y=p.Timestamp |y;
-	p.Timestamp = p.Timestamp >> 8;
-	//printf("Décompo y = %u\n",y );
-	x=p.Timestamp |x;
-	p.Timestamp = p.Timestamp >> 8;
-	//printf("Décompo x = %u\n",x);
-	w=p.Timestamp |w;
-	//printf("Décompo w = %u\n",w );
-
-
+		z=p.Timestamp |z;
+		p.Timestamp = p.Timestamp >> 8;
+		//printf("Décompo z = %u\n",z );
+		y=p.Timestamp |y;
+		p.Timestamp = p.Timestamp >> 8;
+		//printf("Décompo y = %u\n",y );
+		x=p.Timestamp |x;
+		p.Timestamp = p.Timestamp >> 8;
+		//printf("Décompo x = %u\n",x);
+		w=p.Timestamp |w;
+		//printf("Décompo w = %u\n",w );
 
 
-	//encodage du Timestamp
-	*((*b).content+4)  = *((*b).content+4)  | w;
-	*((*b).content+5)  = *((*b).content+5)  | x;
-	*((*b).content+6)  = *((*b).content+6)  | y;
-	*((*b).content+7)  = *((*b).content+7)  | z;
+
+
+		//encodage du Timestamp
+		*((*b).content+(i+1))  = *((*b).content+(i+1))  | w;
+		*((*b).content+(i+2))  = *((*b).content+(i+2))  | x;
+		*((*b).content+(i+3))  = *((*b).content+(i+3))  | y;
+		*((*b).content+(i+4))  = *((*b).content+(i+4))  | z;
 	
 
 
@@ -290,16 +299,18 @@ void buffToStruct(Paquet *p, Buffer b){
 	*(b.content) = *(b.content) >> 1;
 	(*p).type = (*p).type | *(b.content);
 
-
+	//i => indice de décalage
+	int i;
 
 	//si  L==0
 	if(copy == 0){
 		(*p).L = 0;
 		(*p).length7 = (*p).length7 | *(b.content+1);
-		printf("yolo\n");
+		i=2;
 	}
 	//si L!=0
 	else if(copy == 1){
+		i=3;
 		(*p).L = 1;
 		//recomposition length15
 		uint8_t l1 = 0;
@@ -317,7 +328,7 @@ void buffToStruct(Paquet *p, Buffer b){
 	}
 	else {printf("bug lors du décodage (L!=0 et L!=1)\n");}
 	
-	(*p).Seqnum = (*p).Seqnum | *(b.content+3);
+	(*p).Seqnum = (*p).Seqnum | *(b.content+i);
 
 	//recomposition Timestamp
 	uint8_t w =0;
@@ -325,10 +336,10 @@ void buffToStruct(Paquet *p, Buffer b){
 	uint8_t y =0;
 	uint8_t z =0;
 
-	w = w | *(b.content+4);
-	x = x | *(b.content+5);
-	y = y | *(b.content+6);
-	z = z | *(b.content+7);
+	w = w | *(b.content+(i+1));
+	x = x | *(b.content+(i+2));
+	y = y | *(b.content+(i+3));
+	z = z | *(b.content+(i+4));
 
 	(*p).Timestamp = (*p).Timestamp | w;
 	(*p).Timestamp = (*p).Timestamp << 8;
