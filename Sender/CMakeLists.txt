@@ -3,4 +3,7 @@ project(Sender C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(Sender main.c client.c server.c)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -lz")
+
+
+add_executable(Sender main.c )

@@ -1,4 +1,4 @@
-# Install script for directory: /mnt/d/UCL/Bac3/Reseau/NetworkSender/Sender
+# Install script for directory: /home/lobster/Documents/Sender/NetworkSender/Sender
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/mnt/d/UCL/Bac3/Reseau/NetworkSender/Sender/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/lobster/Documents/Sender/NetworkSender/Sender/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

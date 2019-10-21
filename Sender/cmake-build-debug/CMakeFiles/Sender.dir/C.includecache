@@ -6,7 +6,19 @@
 
 #IncludeRegexTransform: 
 
-/mnt/d/UCL/Bac3/Reseau/NetworkSender/Sender/main.c
+/home/lobster/Documents/Sender/NetworkSender/Sender/main.c
 stdio.h
+-
+sys/socket.h
+-
+string.h
+-
+arpa/inet.h
+-
+errno.h
+-
+stdlib.h
+-
+zlib.h
 -
 

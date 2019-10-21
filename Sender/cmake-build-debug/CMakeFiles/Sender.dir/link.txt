@@ -1,1 +1,1 @@
-/usr/bin/cc -g   CMakeFiles/Sender.dir/main.c.o CMakeFiles/Sender.dir/client.c.o CMakeFiles/Sender.dir/server.c.o  -o Sender 
+/usr/bin/cc  -lz -g   CMakeFiles/Sender.dir/main.c.o  -o Sender 

@@ -13,7 +13,7 @@ char * filename = NULL;
 char * address;
 int port ;
 FILE *file;
-uLong crc ;
+uint32_t crc ;
 
 int argReader(int argc, char *argv[]){
     //TODO argument arror check
@@ -28,6 +28,7 @@ int argReader(int argc, char *argv[]){
             i++; //port numer
             port = atoi(argv[i]);
             i = argc;
+            i++;
         }
     }
     if (filename == NULL){
@@ -95,27 +96,67 @@ void buffToStruct(Paquet *p, Buffer b);
 
 char * packetGenerator ( Paquet p , char * payload , int payloadLen){
     //TODO TR 1 case
+    // shift in case of length 7 instead of 15
+    int shift = 0;
+    if(!(p.L)) shift = 1;
+
+	char *packet = malloc(sizeof(char)*(12-shift+payloadLen));
+
+    char* header[8-shift];
+
+    Buffer headBuff ;
+    headBuff.content = calloc(8-shift,sizeof(char));
+    if(headBuff.content==NULL){printf("Le malloc a échoué\n");}
+    structToBuff(p,&headBuff);
+    //packet to buffer
 
 
-	char *packet[64+512];
-    //todo check packet size ?
-    char* header[64];
-    //todo variable header size
-    structToBuff(p,header);
+    //header buffer to final packet buffer
+    for(int i = 0 ; i < 8-shift ; i++){
+        header[i] =headBuff.content[i];
+    }
 
     //copy header to final packet
-    for(int i = 0 ; i < 32 ; i++){
+    for(int i = 0 ; i < 8-shift ; i++){
         packet[i] = header[i];
     }
 
-    crc  = crc32(crc , payload, payloadLen);
-    payload[32] = crc;
+/*
+    for(int i = 0 ; i < 64*64 ; i++){
+        crc=0;
+        crc  = (uint32_t) crc32(crc , (Bytef *)(headBuff.content), i);
+        if(crc == 568805601){
+            printf("crc value found non htonl %d \n", i);
+        }
+        if(htonl(crc) == 568805601){
+            printf("crc value found htonl %d", i);
+        }
+
+    }
+*/
+
+    crc= 0;
+    crc  = (uint32_t) crc32(crc , (Bytef *)(headBuff.content), 8);
+    //crc= 2214560385;
+    uLong crccpy=crc;
+    printf("crc 1 : %lu \n" , crc);
+    printf("crc 2 : %lu \n" , htonl(crc));
+    uint8_t tempcrc=0;
+    for(int i = 0 ; i < 4 ;i++){
+        tempcrc=crccpy;
+        packet[11-shift-i] =tempcrc;
+        crccpy=crccpy >>8;
+    }
+    //packet[12-shift] = crc;
+    //payload[32] = crc;
+
+
 
 
 
 
     for (int i = 0 ; i < payloadLen; i++){
-    	packet[i+96] = payload[i];
+    	packet[i+12-shift] = payload[i];
     	//98 for 64 header and 32 crc
     }
 
@@ -126,17 +167,38 @@ char * packetGenerator ( Paquet p , char * payload , int payloadLen){
 
 }
 
+struct Paquet packetConstructor(unsigned int type ,unsigned int TR ,unsigned int window,unsigned int L ,unsigned int length ,unsigned int seqnum,unsigned int timestamp){
+    Paquet res ;
+
+    res.type = type;
+    res.TR = TR;
+    res.window = window;
+    res.L = L;
+    res.length7 = length;
+    res.length15 = length;
+    res.Seqnum = seqnum;
+    res.Timestamp = timestamp;
+
+    return res;
+
+}
+
 
 int main (int argc, char **argv){
 
-	crc = crc32(0L,Z_NULL,0);
+    printf("Starting ... \n");
+
+  	crc = crc32(0L,Z_NULL,0);
 	//crc needs to be initialised at each startup
 
 	argReader(argc,argv);
 
-	char * payload[512] = {0};
+	printf("Args processed \n");
+    printf("address %s , port %d  \n" , address , port);
 
-	int payLen = getPayload(payload, file, 512);
+    char * payload[512] = {0};
+
+    int payLen = getPayload(payload, file, 512);
 
 
 	//init part
@@ -156,70 +218,40 @@ int main (int argc, char **argv){
 
 
 
-	/*
-     *
 
-    for(int i  = 1 ; i < argc ; i++){
-        printf(argv[i]);
-        printf("\n");
-    }
-
-
-    printf("end \n");
-
-    argReader(argc,argv);
-
-
-
-    if(file == NULL){
-        printf("Error , can't open file \n");
-        return -1;
-    }
-
-
-
-    for(int i = 0 ; i < 12 ; i++){
-        printf("\n\n\n\n");
-
-        getPayload(payload,file, 512);
-
-    }
-
-
-
-
-    printf("\n");
-    printf("address is %s : %d \n", address ,port);
-    return 0;
-     */
-
-
-
+/*
 	Buffer buff;
-	buff.content = calloc(32,sizeof(char));
+	buff.content = calloc(64,sizeof(char));
 	if(buff.content==NULL){printf("Le malloc a échoué\n");}
+*/
 
 //printf("Size of content: %d\n", (int)sizeof(*(buff.content)));
 
-	Paquet p,p2;
-	p.type = 2;
-	p.TR = 0;
-	p.window = 10;
-	p.L = 1;
-	p.length7 = 46;
-	p.length15 = 29018;
-	p.Seqnum = 198;
-	p.Timestamp = 188632383;
+	Paquet p = packetConstructor(2,0,0,1,payLen,1,1);
 
 
-	char * finalbuffer;
-	finalbuffer = packetGenerator(p,payload,payLen);
-	sent = sendto(sock,finalbuffer,(payLen+64)*sizeof(char),0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
+	printf("\n -> %d", payLen);
+	printf("\n -> %lu", htons(payLen));
+	printf("\n -> %lu", htonl(payLen));
+	printf("\n -> %lu", p.length15);
 
-	structToBuff(p,&buff);
-	buffToStruct(&p2,buff);
-	display(p2);
+	char * finalbuffer = malloc(sizeof(char)*(payLen+12-p.L));
+//	finalbuffer = packetGenerator(p,payload,payLen);
 
+	memcpy(finalbuffer,packetGenerator(p,payload,payLen),sizeof(char)*(payLen+12-p.L));
+
+    char tmp = 'c';
+    for (int i = 0 ; i < payLen+12 ; i++){
+        tmp=finalbuffer[i];
+    }
+
+
+
+    sent = sendto(sock,finalbuffer,(payLen+17-p.L)*sizeof(char),0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
+
+
+
+    printf("\n payload len : %d \n" , payLen);
 
 
 
@@ -247,7 +279,7 @@ void structToBuff(Paquet p, Buffer *b){
 	//printf("byte 1 step 4:%u\n",*((*b).content) );//ok jusqu'ici
 
 	//printf("byte 2 setp 1:%u\n",*((*b).content+1));
-	*((*b).content+1)  = *((*b).content+1) | p.L;
+//	*((*b).content+1)  = *((*b).content+1) | p.L;
 	//printf("byte 2 setp 2:%u\n",*((*b).content+1));
 	
 	//i => indice de décalage (nom biz)
@@ -269,11 +301,16 @@ void structToBuff(Paquet p, Buffer *b){
 		l2 =  p.length15 | l2;
 		p.length15 = p.length15 >> 8;
 		l1= p.length15 | l1;
-		//printf("l1: %u\n",l1);
-		//printf("l2: %u\n",l2);
+	//	printf("l1: %u\n",l1);
+	//	printf("l2: %u\n",l2);
 
-		//encodage du length15
-		*((*b).content+1)  = *((*b).content+1)+128 | l1;
+        l1 +=128;
+   //     printf("l1 +128: %u\n",l1);
+    //    printf(" \n here1:::%d" , *((*b).content+1));
+
+        //encodage du length15
+        *((*b).content+1)  = *((*b).content+1) | l1;
+      //  printf(" \n here:::%d" , *((*b).content+1));
 		*((*b).content+2)  = *((*b).content+2) | l2;
 
 		
