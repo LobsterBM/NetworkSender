@@ -59,7 +59,7 @@ int main (int argc, char **argv){
 	
 
 
-
+/*
 	while(1){
 		printf("Listenning..\n");
 		Buffer buff;
@@ -91,9 +91,10 @@ int main (int argc, char **argv){
 		
 		
 
-	}
+	}*/
 
-	/* ancien
+	int count=0;
+	//ancien
 	//bind_and_receive_from_peer(sock,(struct sockaddr*)&peer_addr,peer_addr_len);
 	while(1){
 		printf("Listenning..\n");
@@ -101,21 +102,32 @@ int main (int argc, char **argv){
 		
 
 		init_buff(buff,buff_maxsize);
+
+
+		//info reception
+		struct sockaddr_in6 peer2_addr;
+		socklen_t peer_len2 = sizeof(peer2_addr);
+		ssize_t reception = recvfrom(sock,buff,(size_t)buff_maxsize,0,(struct sockaddr *)&peer2_addr,&peer_len2); // réception string
+		count++;
+		printf("reception port :%d\n", peer2_addr.sin6_port);
 		
-		ssize_t reception = recv(sock,buff,(size_t)buff_maxsize,0); // réception string
+		//if(count!=2){
+			int	sent = sendto(sock,buff,sizeof(buff),0,(const struct sockaddr *)&peer2_addr, peer_len2);
+		//}
 		
+
 		//ssize_t reception = recvfrom(sock2,buff,buff_maxsize,0,(struct sockaddr*)&peer_addr,&peer_addr_len);
 		if(reception == -1){printf("Erreur lors de la réception des données.\n");}
 
 		
-		printf("%s\n",buff);
+		printf("msg reçu :%s\n",buff);
 		
 		
 
-	}*/
+	}
 	
 
-	printf("Server closed.\n");
+	
 
 
 return 0;}

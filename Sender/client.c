@@ -4,6 +4,8 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <poll.h>
+#include <sys/time.h>
 
 
 //structures
@@ -37,6 +39,7 @@ struct Buffer
 void display(Paquet p);
 void structToBuff(Paquet p, Buffer *b);
 void buffToStruct(Paquet *p, Buffer b);
+int is_time_out(struct timeval t, int timeout);
 //fin
 
 
@@ -49,65 +52,140 @@ int main (int argc, char **argv){
 
 	struct sockaddr_in6 peer_addr;                      // allocate the address on the stack
 	memset(&peer_addr, 0, sizeof(peer_addr));           // fill the address with 0-bytes to avoid garbage-values
-	peer_addr.sin6_family = AF_INET6;                   // indicate that the address is an IPv6 address
-	peer_addr.sin6_port = htons(55555);                 // indicate that the programm is running on port 55555
+	peer_addr.sin6_family = AF_INET6;
+	if(argc>1){
+		int portDest = atoi(argv[1]);
+		peer_addr.sin6_port = htons(portDest);  
+	}           
+	else{
+		peer_addr.sin6_port = htons(55555);  
+	}        // indicate that the address is an IPv6 address
+	               // indicate that the programm is running on port 55555
 	inet_pton(AF_INET6, "::1", &peer_addr.sin6_addr);   // indicate that the program is running on the computer identified by the ::1 IPv6 address
 
 
-	//sending part
+	//poll stuff
+	int fds_length =2;
+	struct pollfd fds[fds_length];
+	int timeout = 3000;
 	ssize_t sent=0;
-	
-	
-		
-	if(argc>2){
-		printf("%s\n", argv[1]);
-		sent = sendto(sock,argv[1],strlen(argv[1]),0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
-	}
-	else if(argc>1){
 
-		Buffer buff;
-		buff.content = calloc(32,sizeof(char));
-		if(buff.content==NULL){printf("Le malloc a échoué\n");}
-		buff.networkContent = calloc(32,sizeof(char));
-		if(buff.networkContent==NULL){printf("Le malloc a échoué\n");}
+	//reception stuff
+	int buff_maxsize =32;
+	char *buff= calloc(buff_maxsize,sizeof(char));
+	if(buff==NULL){printf("fail de malloc\n");}
+	char *buffSend= calloc(buff_maxsize,sizeof(char));
+	if(buffSend==NULL){printf("fail de malloc\n");}
 
-		//printf("Size of content: %d\n", (int)sizeof(*(buff.content)));
+	struct sockaddr_in6 peer2_addr;
+	socklen_t peer2_len = sizeof(peer2_addr);
 
-		Paquet p,p2;
-		p.type = 2;
-		p.TR = 0;
-		p.window = 10;
-		p.L = 0;
-		p.length7 = 46;
-		p.length15 = 29018;
-		p.Seqnum = 198;
-		p.Timestamp = 188632383;
-
-		structToBuff(p,&buff);
-		buffToStruct(&p2,buff);
-		display(p2);
-
-
-		sent = sendto(sock,buff.content,32*sizeof(char),0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
-	}
-	else{
-		sent = sendto(sock,"hello",strlen("hello"),0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
-	}
+		int count =0;
+		int window=2;
+		int seqnumLength =4;
+		int seqnum[4] = {3,4,5,6};
+		int sentTab[4]= {0,0,0,0};// 0: non envoyé, 1: envoyé mais pas ack, 2: envoyé et ack
 
 		
-	
+		int a=0;
+
+	//boucle principale 
+	while(count<seqnumLength){
+			fds[0].fd=sock;
+			fds[0].events = 0;
+			fds[0].events |= POLLIN;
+
+
+			fds[1].fd=sock;
+			fds[1].events = 0;
+			fds[1].events |= POLLOUT;
+		
+
+			
+			int pret = poll(fds,fds_length,timeout);
+
+			
+			
+
+			if(pret>0){
+				
+
+			
+				for(int i=0;i<fds_length;i++){
+					if(fds[i].revents==POLLOUT && window>0 && count<seqnumLength){
+						printf("POLLOUT, i: %d,  count:%d, window:%d\n",i,count,window);
+						int num=-1;
+						for(int j=0;j<seqnumLength;j++){
+						
+							if(sentTab[j]==0){
+								num=seqnum[j];
+								sentTab[j]=1;//envoyé
+								break;
+							}
+						}
+						//vérifie qu'il y ai bien un seqnum à envoyer
+						if(num!=-1){
+							sprintf(buffSend, "%d", num);
+							printf("numseq envoyé: %s\n", buffSend);
+							sent = sendto(sock,buffSend,sizeof(buffSend),0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
+							if(sent == -1){printf("Erreur lors de l'envoi.\n");}
+							window--;
+						}
+						
+					}
+					else if(fds[i].events==1 && fds[i].revents==POLLIN){
+						printf("POLLIN ");
+						ssize_t reception = recvfrom(sock,buff,(size_t)buff_maxsize,0,(struct sockaddr *)&peer2_addr,&peer2_len); 
+						int num = atoi(buff);
+						printf("                 ack reçu:%d\n",num);
+						for(int j=0;j<seqnumLength;j++){
+							if(seqnum[j]==num){
+								sentTab[j]=2;//ack
+								//printf("test:%d\n", seqnum[j]);
+								count++;
+								window++;
+								break;
+							}
+						}
+						
+
+					}
+				}
+
+				
+				
+			}
+			
+
+
+		}
 	
 		
+
 	
 	
-	if(sent == -1){printf("Erreur lors de l'envoi.\n");}
-	//else {printf("Envoi réussi.\n");}
+	
+
+	/*truc de base
+	while(1){
+		struct sockaddr_in6 peer2_addr;
+		socklen_t peer2_len = sizeof(peer2_addr);
+		ssize_t reception = recvfrom(sock,buff,(size_t)buff_maxsize,0,(struct sockaddr *)&peer2_addr,&peer2_len); // réception string
+		printf("reception port :%d\n", peer2_addr.sin6_port);
+	}*/
 	printf("Client closed.\n");
 
 
 return 0;}
 
 
+int is_time_out(struct timeval t, int timeout){
+  struct timeval stop;
+  gettimeofday(&stop,NULL);
+  int a = stop.tv_usec - t.tv_usec;
+  printf("timelapse:%d",a);
+    return 0;
+}
 
 
 void buffToStruct(Paquet *p, Buffer b){
