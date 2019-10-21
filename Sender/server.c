@@ -111,9 +111,10 @@ int main (int argc, char **argv){
 		count++;
 		printf("reception port :%d\n", peer2_addr.sin6_port);
 		
-		//if(count!=2){
+		if(count!=2){
+			//printf("count :%d\n",count);
 			int	sent = sendto(sock,buff,sizeof(buff),0,(const struct sockaddr *)&peer2_addr, peer_len2);
-		//}
+		}
 		
 
 		//ssize_t reception = recvfrom(sock2,buff,buff_maxsize,0,(struct sockaddr*)&peer_addr,&peer_addr_len);

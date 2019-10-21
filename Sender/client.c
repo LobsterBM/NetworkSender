@@ -85,6 +85,9 @@ int main (int argc, char **argv){
 		int seqnumLength =4;
 		int seqnum[4] = {3,4,5,6};
 		int sentTab[4]= {0,0,0,0};// 0: non envoyé, 1: envoyé mais pas ack, 2: envoyé et ack
+		struct timeval timeSending[4];
+		int timeoutPerso = 1000000;//microsec
+
 
 		
 		int a=0;
@@ -113,18 +116,27 @@ int main (int argc, char **argv){
 			
 				for(int i=0;i<fds_length;i++){
 					if(fds[i].revents==POLLOUT && window>0 && count<seqnumLength){
-						printf("POLLOUT, i: %d,  count:%d, window:%d\n",i,count,window);
+						//printf("POLLOUT, i: %d,  count:%d, window:%d\n",i,count,window);
 						int num=-1;
+						int indice =0;
+						int found =0;
 						for(int j=0;j<seqnumLength;j++){
-						
-							if(sentTab[j]==0){
+							if(sentTab[j]==1){
+								if(is_time_out(timeSending[j],timeoutPerso)){
+									printf("timeout dépassé\n");
+									sentTab[j]=0;
+								}
+							}
+							if(sentTab[j]==0 && found==0){
 								num=seqnum[j];
 								sentTab[j]=1;//envoyé
-								break;
+								indice = j;
+								found=1;//check si on a déjà un seq num à envoyé. Mais la boucle doit continuer pour vérif les timers.
 							}
 						}
 						//vérifie qu'il y ai bien un seqnum à envoyer
 						if(num!=-1){
+							gettimeofday(&timeSending[indice],NULL);
 							sprintf(buffSend, "%d", num);
 							printf("numseq envoyé: %s\n", buffSend);
 							sent = sendto(sock,buffSend,sizeof(buffSend),0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
@@ -138,6 +150,8 @@ int main (int argc, char **argv){
 						ssize_t reception = recvfrom(sock,buff,(size_t)buff_maxsize,0,(struct sockaddr *)&peer2_addr,&peer2_len); 
 						int num = atoi(buff);
 						printf("                 ack reçu:%d\n",num);
+
+						//cette boucle peut être remplacé par une méthode en O(1)
 						for(int j=0;j<seqnumLength;j++){
 							if(seqnum[j]==num){
 								sentTab[j]=2;//ack
@@ -154,6 +168,9 @@ int main (int argc, char **argv){
 
 				
 				
+			}
+			else{
+				printf("nothing happened\n");
 			}
 			
 
@@ -182,8 +199,11 @@ return 0;}
 int is_time_out(struct timeval t, int timeout){
   struct timeval stop;
   gettimeofday(&stop,NULL);
-  int a = stop.tv_usec - t.tv_usec;
-  printf("timelapse:%d",a);
+  time_t a = stop.tv_usec - t.tv_usec;
+  printf("timelapse:%ld\n",a);
+  if(a>timeout){
+  	printf("timelapse:%ld\n",a);
+  	return 1;}
     return 0;
 }
 
