@@ -14,6 +14,7 @@ char * address;
 int port ;
 FILE *file;
 uint32_t crc ;
+uint32_t crc2 ;
 
 int argReader(int argc, char *argv[]){
     //TODO argument arror check
@@ -44,12 +45,14 @@ int argReader(int argc, char *argv[]){
 
 int getPayload(char * payload, FILE * file, int byteRead){
 
-    memset(payload, 0, sizeof(char)*byteRead);
+    memset(payload, 0, sizeof(char)*(byteRead));
 
    ssize_t bytesRead = fread(payload, sizeof(char), byteRead, file);
    if (bytesRead == 0){
        //TODO error
+       return 0;
    }
+
    printf("bytes read : %d \n" , (int)bytesRead);
    printf(payload);
    return bytesRead;
@@ -100,7 +103,7 @@ char * packetGenerator ( Paquet p , char * payload , int payloadLen){
     int shift = 0;
     if(!(p.L)) shift = 1;
 
-	char *packet = malloc(sizeof(char)*(12-shift+payloadLen));
+	char *packet = malloc(sizeof(char)*(16-shift+payloadLen));
 
     char* header[8-shift];
 
@@ -125,22 +128,23 @@ char * packetGenerator ( Paquet p , char * payload , int payloadLen){
     for(int i = 0 ; i < 64*64 ; i++){
         crc=0;
         crc  = (uint32_t) crc32(crc , (Bytef *)(headBuff.content), i);
-        if(crc == 568805601){
+        if(crc == 3717726950){
             printf("crc value found non htonl %d \n", i);
         }
-        if(htonl(crc) == 568805601){
+        if(htonl(crc) == 3717726950){
             printf("crc value found htonl %d", i);
         }
 
     }
+
 */
 
     crc= 0;
-    crc  = (uint32_t) crc32(crc , (Bytef *)(headBuff.content), 8);
+    crc  = (uint32_t) crc32(crc , (Bytef *)(headBuff.content), 8-shift);
     //crc= 2214560385;
     uLong crccpy=crc;
-    printf("crc 1 : %lu \n" , crc);
-    printf("crc 2 : %lu \n" , htonl(crc));
+    printf("\n crc 1 h : %lu \n" , crc);
+    printf("crc 1 n : %lu \n" , htonl(crc));
     uint8_t tempcrc=0;
     for(int i = 0 ; i < 4 ;i++){
         tempcrc=crccpy;
@@ -153,13 +157,28 @@ char * packetGenerator ( Paquet p , char * payload , int payloadLen){
 
 
 
-
-
     for (int i = 0 ; i < payloadLen; i++){
     	packet[i+12-shift] = payload[i];
     	//98 for 64 header and 32 crc
     }
 
+
+
+    crc2 = 0;
+    crc2  = (uint32_t) crc32(crc2 , (Bytef *)(payload), payloadLen);
+
+    uLong crccpy2=0;
+     crccpy2=crc2;
+    printf("\n crc 2 h : %lu \n" , crc2);
+    printf("crc 2 n : %lu \n" , htonl(crc2));
+    uint8_t tempcrc2=0;
+    for(int i = 0 ; i < 4 ;i++){
+        tempcrc2=crccpy2;
+        packet[payloadLen+16-1-shift-i] =tempcrc2;
+        crccpy2=crccpy2 >>8;
+    }
+
+    printf("\n crc 2 post add : %lu \n" , (uLong) packet[payloadLen+12-shift+1] );
 
     return packet;
 
@@ -196,25 +215,22 @@ int main (int argc, char **argv){
 	printf("Args processed \n");
     printf("address %s , port %d  \n" , address , port);
 
-    char * payload[512] = {0};
-
-    int payLen = getPayload(payload, file, 512);
 
 
-	//init part
-	int sock = socket(AF_INET6,SOCK_DGRAM,0);
-	if(sock == -1 ){printf("Erreur lors de la création des sockets.\n");}
+    //init part
+    int sock = socket(AF_INET6,SOCK_DGRAM,0);
+    if(sock == -1 ){printf("Erreur lors de la création des sockets.\n");}
 
-	struct sockaddr_in6 peer_addr;                      // allocate the address on the stack
-	memset(&peer_addr, 0, sizeof(peer_addr));           // fill the address with 0-bytes to avoid garbage-values
-	peer_addr.sin6_family = AF_INET6;                   // indicate that the address is an IPv6 address
-	peer_addr.sin6_port = htons(port);                 // indicate that the programm is running on port 55555
-	inet_pton(AF_INET6, address, &peer_addr.sin6_addr);   // indicate that the program is running on the computer identified by the ::1 IPv6 address
+    struct sockaddr_in6 peer_addr;                      // allocate the address on the stack
+    memset(&peer_addr, 0, sizeof(peer_addr));           // fill the address with 0-bytes to avoid garbage-values
+    peer_addr.sin6_family = AF_INET6;                   // indicate that the address is an IPv6 address
+    peer_addr.sin6_port = htons(port);                 // indicate that the programm is running on port 55555
+    inet_pton(AF_INET6, address, &peer_addr.sin6_addr);   // indicate that the program is running on the computer identified by the ::1 IPv6 address
 
 
 
-	//sending part
-	ssize_t sent=0;
+    //sending part
+    ssize_t sent=0;
 
 
 
@@ -226,8 +242,16 @@ int main (int argc, char **argv){
 */
 
 //printf("Size of content: %d\n", (int)sizeof(*(buff.content)));
+    char * payload[512] = {0};
 
-	Paquet p = packetConstructor(2,0,0,1,payLen,1,1);
+    int payLen = getPayload(payload, file, 512);
+
+    int L = 0;
+    if(payLen >= 512){
+        L = 1;
+    }
+
+    Paquet p = packetConstructor(1,0,1,L,payLen,0,3);
 
 
 	printf("\n -> %d", payLen);
@@ -235,29 +259,60 @@ int main (int argc, char **argv){
 	printf("\n -> %lu", htonl(payLen));
 	printf("\n -> %lu", p.length15);
 
-	char * finalbuffer = malloc(sizeof(char)*(payLen+12-p.L));
+    int shift = 0 ;
+    if(L == 0){
+        shift = 1;
+    }
+    char * finalbuffer = malloc(sizeof(char)*(payLen+12-shift));
 //	finalbuffer = packetGenerator(p,payload,payLen);
 
-	memcpy(finalbuffer,packetGenerator(p,payload,payLen),sizeof(char)*(payLen+12-p.L));
 
-    char tmp = 'c';
-    for (int i = 0 ; i < payLen+12 ; i++){
-        tmp=finalbuffer[i];
+    memcpy(finalbuffer,packetGenerator(p,payload,payLen),sizeof(char)*(payLen+16-shift));
+
+
+
+    sent = sendto(sock,finalbuffer,payLen+16-shift,0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
+
+
+
+
+
+    char * payload2[512] = {0};
+
+    int payLen2 = getPayload(payload2, file, 512);
+
+    int L2 = 0;
+    if(payLen2 >= 512){
+        L2 = 1;
+    }
+    int shift2 = 0 ;
+    if(L2 == 0){
+        shift2 = 1;
     }
 
+    Paquet p2 = packetConstructor(1,0,0,0,0,1,32);
 
 
-    sent = sendto(sock,finalbuffer,(payLen+17-p.L)*sizeof(char),0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
+    char * finalbuffer2 = malloc(sizeof(char)*(12-shift2));
+//	finalbuffer = packetGenerator(p,payload,payLen);
 
-
-
-    printf("\n payload len : %d \n" , payLen);
-
+    memcpy(finalbuffer2,packetGenerator(p2,NULL,0),sizeof(char)*(16-shift2));
 
 
 
 
-	return 0;}
+    sent = sendto(sock,finalbuffer2,12-shift2,0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
+
+
+
+
+
+
+
+
+
+
+    return 0;}
 
 //TODO check structure in binary for during execution
 void structToBuff(Paquet p, Buffer *b){
