@@ -146,7 +146,7 @@ int main (int argc, char **argv){
 						
 					}
 					else if(fds[i].events==1 && fds[i].revents==POLLIN){
-						printf("POLLIN ");
+						//printf("POLLIN ");
 						ssize_t reception = recvfrom(sock,buff,(size_t)buff_maxsize,0,(struct sockaddr *)&peer2_addr,&peer2_len); 
 						int num = atoi(buff);
 						printf("                 ack reçu:%d\n",num);
@@ -199,8 +199,11 @@ return 0;}
 int is_time_out(struct timeval t, int timeout){
   struct timeval stop;
   gettimeofday(&stop,NULL);
+  time_t b = stop.tv_sec -t.tv_sec;
+  b*= 1000000;
   time_t a = stop.tv_usec - t.tv_usec;
-  printf("timelapse:%ld\n",a);
+  a+=b;
+ // printf("timelapse:%ld\n",a);
   if(a>timeout){
   	printf("timelapse:%ld\n",a);
   	return 1;}
