@@ -4,7 +4,11 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <zlib.h>
 
+
+uint32_t crc;
+uint32_t crc2;
 
 typedef struct Paquet Paquet;
 struct Paquet
@@ -34,11 +38,15 @@ void display(Paquet p);
 void structToBuff(Paquet p, Buffer *b);
 void buffToStruct(Paquet *p, Buffer b);
 int init_buff(char *buff, int buff_len);
+struct Paquet packetConstructor(unsigned int type ,unsigned int TR ,unsigned int window,unsigned int L ,unsigned int length ,unsigned int seqnum,unsigned int timestamp);
+char * packetGenerator( Paquet p , char * payload , int payloadLen);
 //fin
 
 
 int main (int argc, char **argv){
 
+
+	crc = crc32(0L,Z_NULL,0);
 	//init part
 	int sock = socket(AF_INET6,SOCK_DGRAM,0);
 	if(sock == -1 ){printf("Erreur lors de la création des sockets.\n");}
@@ -58,7 +66,7 @@ int main (int argc, char **argv){
 	if(bound == -1){printf("Erreur lors de la liaison\n");}
 	
 
-	Paquet p;
+	Paquet p,p2;
 	int found=0;
 
 
@@ -82,13 +90,18 @@ int main (int argc, char **argv){
 		int eof=0;
 		eof|=*(buff.content+1);
 		if(eof!=0 ){
+			
 
 			buffToStruct(&p,buff);
 			display(p);
-			sprintf(buffSending,"%d",p.Seqnum);
+			//sprintf(buffSending,"%d",p.Seqnum);
 			printf("found :%d\n",found);	
+			p2 = packetConstructor(2,0,5,0,0,p.Seqnum,4);
+			char *finalbuff =  malloc(sizeof(char)*11);
+			memcpy(finalbuff,packetGenerator(p,NULL,0),sizeof(char)*11);
 			if(found!=2){
-				ssize_t sent = sendto(sock,buffSending,sizeof(*buffSending),0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
+				//ssize_t sent = sendto(sock,buffSending,sizeof(*buffSending),0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
+				ssize_t sent = sendto(sock,finalbuff,11,0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
 				if(sent==-1){printf("fail to send msg back.\n");}
 				printf("ack de seqnum: %d envoyé\n", p.Seqnum);
 			}
@@ -110,7 +123,96 @@ int main (int argc, char **argv){
 
 return 0;}
 
+struct Paquet packetConstructor(unsigned int type ,unsigned int TR ,unsigned int window,unsigned int L ,unsigned int length ,unsigned int seqnum,unsigned int timestamp){
+    Paquet res ;
 
+    res.type = type;
+    res.TR = TR;
+    res.window = window;
+    res.L = L;
+    res.length7 = length;
+    res.length15 = length;
+    res.Seqnum = seqnum;
+    res.Timestamp = timestamp;
+
+    return res;
+
+}
+
+
+char * packetGenerator( Paquet p , char * payload , int payloadLen){
+    //TODO TR 1 case
+    // shift in case of length 7 instead of 15
+    int shift = 0;
+    if(!(p.L)) shift = 1;
+
+	char *packet = malloc(sizeof(char)*(16-shift+payloadLen));
+
+    char* header[8-shift];
+
+    Buffer headBuff ;
+    headBuff.content = calloc(8-shift,sizeof(char));
+    if(headBuff.content==NULL){printf("Le malloc a échoué\n");}
+    structToBuff(p,&headBuff);
+    //packet to buffer
+
+
+    //header buffer to final packet buffer
+    for(int i = 0 ; i < 8-shift ; i++){
+         header[i] =  headBuff.content[i];
+    }
+
+    //copy header to final packet
+    for(int i = 0 ; i < 8-shift ; i++){
+        packet[i] =  header[i];
+    }
+
+
+
+    crc= 0;
+    crc  = (uint32_t) crc32(crc , (Bytef *)(headBuff.content), 8-shift);
+    //crc= 2214560385;
+    uLong crccpy=crc;
+
+    uint8_t tempcrc=0;
+    for(int i = 0 ; i < 4 ;i++){
+        tempcrc=crccpy;
+        packet[11-shift-i] =tempcrc;
+        crccpy=crccpy >>8;
+    }
+    //packet[12-shift] = crc;
+    //payload[32] = crc;
+
+
+
+
+    for (int i = 0 ; i < payloadLen; i++){
+    	packet[i+12-shift] = payload[i];
+    	//98 for 64 header and 32 crc
+    }
+
+
+
+    crc2 = 0;
+    crc2  = (uint32_t) crc32(crc2 , (Bytef *)(payload), payloadLen);
+
+    uLong crccpy2=0;
+     crccpy2=crc2;
+
+    uint8_t tempcrc2=0;
+    for(int i = 0 ; i < 4 ;i++){
+        tempcrc2=crccpy2;
+        packet[payloadLen+16-1-shift-i] =tempcrc2;
+        crccpy2=crccpy2 >>8;
+    }
+
+   // printf("\n crc 2 post add : %lu \n" , (uLong) packet[payloadLen+12-shift+1] );
+
+    return packet;
+
+
+
+}
 
 
 //TODO check structure in binary for during execution

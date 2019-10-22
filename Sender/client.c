@@ -108,7 +108,7 @@ int is_time_out(struct timeval t, int timeout);
 //fin
 
 
-char * packetGenerator ( Paquet p , char * payload , int payloadLen){
+char * packetGenerator( Paquet p , char * payload , int payloadLen){
     //TODO TR 1 case
     // shift in case of length 7 instead of 15
     int shift = 0;
@@ -237,7 +237,9 @@ int main (int argc, char **argv){
     int timeout=1000;//millisec
     int timeoutPerso=1000;//microsec
     char **sendingBuffer[windowSlide];
-    char *receivBuffer[528];
+    //char *receivBuffer[528];
+    Paquet receivPacket;
+    Buffer receivBuffer;
     int seqnumtab[2];//valeur doit valoir window
    	for(int i=0;i<windowSlide;i++){
    		seqnumtab[i]=-1;
@@ -304,7 +306,8 @@ int main (int argc, char **argv){
 				    	if(seqnumtab[i]!=-1 && is_time_out(timeSending[i],timeoutPerso)){
 				    		printf("timeout dépassé i:%d\n",i);
 				    		gettimeofday(&timeSending[i],NULL);
-				    		sent = sendto(sock,sendingBuffer[i],sizeof(*sendingBuffer[i]),0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
+				    		//sent = sendto(sock,sendingBuffer[i],sizeof(*sendingBuffer[i]),0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
+				    		sent = sendto(sock,sendingBuffer[i],payLen+16-shift,0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
 				    		if(sent==-1){printf("fail to resend.\n");}
 				    		}
 				    	
@@ -332,14 +335,16 @@ int main (int argc, char **argv){
 					}
 				
 				else if(fds[0].events==1 && fds[0].revents==POLLIN){
-					
-					ssize_t reception = recvfrom(sock,receivBuffer,sizeof(receivBuffer),0,(struct sockaddr *)&peer2_addr,&peer2_len);
-					int seqnumReceiv = atoi((const char *)receivBuffer);
-					printf("ack %d\n", seqnumReceiv);
+					receivBuffer.content = calloc(528,sizeof(char));
+					ssize_t reception = recvfrom(sock,receivBuffer.content,sizeof(receivBuffer.content),0,(struct sockaddr *)&peer2_addr,&peer2_len);
+					//int seqnumReceiv = atoi((const char *)receivBuffer);
+					buffToStruct(&receivPacket,receivBuffer);
+					display(receivPacket);
+					printf("ack %d\n", receivPacket.Seqnum);
 					 for(int i=0;i<windowSlide;i++){
 					 	//printf("vérif seqnumtab:%d et seqnumReceiv:%d\n",seqnumtab[i],seqnumReceiv );
-				    	if(seqnumtab[i]==seqnumReceiv){
-				    		printf("libération du buffer pour le seqnum:%d\n",seqnumReceiv);
+				    	if(seqnumtab[i]==receivPacket.Seqnum){
+				    		printf("libération du buffer pour le seqnum:%d\n",receivPacket.Seqnum);
 				    		seqnumtab[i]=-1;
 				    		sendingBuffer[i]="\0";
 				    		window++;
@@ -516,6 +521,10 @@ void buffToStruct(Paquet *p, Buffer b){
 	(*p).Seqnum=0;
 	(*p).Timestamp=0;
 
+	printf("                               byte 1:%d\n",*(b.content));
+	printf("                               byte 2:%d\n",*(b.content+1));
+	printf("                               byte 2:%d\n",*(b.content+2));
+
 	//copy de b.c et shift le bit L au bord(droit) de copy 
 	uint32_t copy=*(b.content+1);
 	copy = copy >> 7;
@@ -529,6 +538,7 @@ void buffToStruct(Paquet *p, Buffer b){
 	(*p).TR = (*p).TR | *(b.content);
 	*(b.content) = *(b.content) >> 1;
 	(*p).type = (*p).type | *(b.content);
+
 
 	//i => indice de décalage
 	int i;
@@ -560,6 +570,7 @@ void buffToStruct(Paquet *p, Buffer b){
 	else {printf("bug lors du décodage (L!=0 et L!=1)\n");}
 	
 	(*p).Seqnum = (*p).Seqnum | *(b.content+i);
+	printf("SEQUENCE NUMBER:%d\n",(*p).Seqnum);
 
 	//recomposition Timestamp
 	uint8_t w =0;
