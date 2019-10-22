@@ -72,6 +72,8 @@
       <workItem from="1571593153097" duration="20106000" />
       <workItem from="1571666128608" duration="17616000" />
       <workItem from="1571698587124" duration="6342000" />
+      <workItem from="1571706463866" duration="11000" />
+      <workItem from="1571706530960" duration="4788000" />
     </task>
     <task id="LOCAL-00001" summary="Clion commit test">
       <created>1571054062660</created>
@@ -115,12 +117,12 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/main.c</url>
-          <line>267</line>
+          <line>67</line>
           <option name="timeStamp" value="31" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/main.c</url>
-          <line>275</line>
+          <line>75</line>
           <option name="timeStamp" value="96" />
         </line-breakpoint>
       </breakpoints>

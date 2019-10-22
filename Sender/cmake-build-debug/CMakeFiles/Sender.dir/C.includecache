@@ -6,6 +6,40 @@
 
 #IncludeRegexTransform: 
 
+/home/lobster/Documents/Sender/NetworkSender/Sender/functions.c
+stdio.h
+-
+sys/socket.h
+-
+string.h
+-
+arpa/inet.h
+-
+errno.h
+-
+stdlib.h
+-
+zlib.h
+-
+functions.h
+/home/lobster/Documents/Sender/NetworkSender/Sender/functions.h
+
+/home/lobster/Documents/Sender/NetworkSender/Sender/functions.h
+stdio.h
+-
+sys/socket.h
+-
+string.h
+-
+arpa/inet.h
+-
+errno.h
+-
+stdlib.h
+-
+zlib.h
+-
+
 /home/lobster/Documents/Sender/NetworkSender/Sender/main.c
 stdio.h
 -
@@ -21,4 +55,8 @@ stdlib.h
 -
 zlib.h
 -
+functions.h
+/home/lobster/Documents/Sender/NetworkSender/Sender/functions.h
+functions.c
+/home/lobster/Documents/Sender/NetworkSender/Sender/functions.c
 
