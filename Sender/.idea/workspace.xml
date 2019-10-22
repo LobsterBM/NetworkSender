@@ -22,6 +22,7 @@
   </component>
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
+    <option name="clangWarnings" value="-Wno-unused-variable,-Werror=implicit-function-declaration,-Wshadow,-Wno-shadow-field-in-constructor-modified,-Wno-shadow-ivar,-Wno-int-to-pointer-cast" />
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
   <component name="Git.Settings">
@@ -69,7 +70,8 @@
       <workItem from="1571558250737" duration="3877000" />
       <workItem from="1571581980907" duration="913000" />
       <workItem from="1571593153097" duration="20106000" />
-      <workItem from="1571666128608" duration="16294000" />
+      <workItem from="1571666128608" duration="17616000" />
+      <workItem from="1571698587124" duration="6342000" />
     </task>
     <task id="LOCAL-00001" summary="Clion commit test">
       <created>1571054062660</created>
@@ -113,12 +115,12 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/main.c</url>
-          <line>265</line>
+          <line>267</line>
           <option name="timeStamp" value="31" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/main.c</url>
-          <line>273</line>
+          <line>275</line>
           <option name="timeStamp" value="96" />
         </line-breakpoint>
       </breakpoints>

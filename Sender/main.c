@@ -18,20 +18,28 @@ uint32_t crc2 ;
 
 int argReader(int argc, char *argv[]){
     //TODO argument arror check
-    for(int i = 1 ; i < argc ; i++){
-        if(strstr(argv[i],"-f" ) != NULL){
-            i++;
-            filename = argv[i];
-            //TODO extract filename from position i+1
-        }
-        else{
-            address = argv[i];
-            i++; //port numer
-            port = atoi(argv[i]);
-            i = argc;
-            i++;
-        }
+    if(argc < 4){
+
+        address = argv[1];
+        port = atoi(argv[2]);
     }
+    else if(strstr(argv[1],"-f") != NULL){
+        filename = argv[2];
+        address = argv[3];
+        port = atoi(argv[4]);
+
+    }
+    else if (strstr(argv[3], "-f") != NULL){
+        filename = argv[4];
+        address = argv[1];
+        port = atoi(argv[2]);
+
+    }
+    else{
+        address = argv[1];
+        port = atoi(argv[2]);
+    }
+
     if (filename == NULL){
         file = stdin;
     }
@@ -54,7 +62,7 @@ int getPayload(char * payload, FILE * file, int byteRead){
    }
 
    printf("bytes read : %d \n" , (int)bytesRead);
-   printf(payload);
+
    return bytesRead;
 
 }
@@ -116,12 +124,12 @@ char * packetGenerator ( Paquet p , char * payload , int payloadLen){
 
     //header buffer to final packet buffer
     for(int i = 0 ; i < 8-shift ; i++){
-        header[i] =headBuff.content[i];
+         header[i] =  headBuff.content[i];
     }
 
     //copy header to final packet
     for(int i = 0 ; i < 8-shift ; i++){
-        packet[i] = header[i];
+        packet[i] =  header[i];
     }
 
 /*
@@ -143,8 +151,7 @@ char * packetGenerator ( Paquet p , char * payload , int payloadLen){
     crc  = (uint32_t) crc32(crc , (Bytef *)(headBuff.content), 8-shift);
     //crc= 2214560385;
     uLong crccpy=crc;
-    printf("\n crc 1 h : %lu \n" , crc);
-    printf("crc 1 n : %lu \n" , htonl(crc));
+
     uint8_t tempcrc=0;
     for(int i = 0 ; i < 4 ;i++){
         tempcrc=crccpy;
@@ -169,8 +176,7 @@ char * packetGenerator ( Paquet p , char * payload , int payloadLen){
 
     uLong crccpy2=0;
      crccpy2=crc2;
-    printf("\n crc 2 h : %lu \n" , crc2);
-    printf("crc 2 n : %lu \n" , htonl(crc2));
+
     uint8_t tempcrc2=0;
     for(int i = 0 ; i < 4 ;i++){
         tempcrc2=crccpy2;
@@ -244,7 +250,7 @@ int main (int argc, char **argv){
 //printf("Size of content: %d\n", (int)sizeof(*(buff.content)));
     char * payload[512] = {0};
 
-    int payLen = getPayload(payload, file, 512);
+    int payLen = getPayload((char*)payload, file, 512);
 
     int L = 0;
     if(payLen >= 512){
@@ -254,20 +260,16 @@ int main (int argc, char **argv){
     Paquet p = packetConstructor(1,0,1,L,payLen,0,3);
 
 
-	printf("\n -> %d", payLen);
-	printf("\n -> %lu", htons(payLen));
-	printf("\n -> %lu", htonl(payLen));
-	printf("\n -> %lu", p.length15);
 
     int shift = 0 ;
     if(L == 0){
         shift = 1;
     }
-    char * finalbuffer = malloc(sizeof(char)*(payLen+12-shift));
+    char * finalbuffer = malloc(sizeof(char)*(payLen+16-shift));
 //	finalbuffer = packetGenerator(p,payload,payLen);
 
 
-    memcpy(finalbuffer,packetGenerator(p,payload,payLen),sizeof(char)*(payLen+16-shift));
+    memcpy(finalbuffer,packetGenerator(p,(char*)payload,payLen),sizeof(char)*(payLen+16-shift));
 
 
 
@@ -279,7 +281,7 @@ int main (int argc, char **argv){
 
     char * payload2[512] = {0};
 
-    int payLen2 = getPayload(payload2, file, 512);
+    int payLen2 = getPayload((char*)payload2, file, 512);
 
     int L2 = 0;
     if(payLen2 >= 512){
