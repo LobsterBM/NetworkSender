@@ -59,6 +59,7 @@ int main (int argc, char **argv){
 	
 
 	Paquet p;
+	int found=0;
 
 
 	while(1){
@@ -80,17 +81,21 @@ int main (int argc, char **argv){
 
 		int eof=0;
 		eof|=*(buff.content+1);
-		if(eof!=0){
+		if(eof!=0 ){
+
 			buffToStruct(&p,buff);
 			display(p);
 			sprintf(buffSending,"%d",p.Seqnum);
-			ssize_t sent = sendto(sock,buffSending,sizeof(*buffSending),0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
-			if(sent==-1){printf("fail to send msg back.\n");}
-			printf("ack de seqnum: %d envoyé\n", p.Seqnum);
+			
+				ssize_t sent = sendto(sock,buffSending,sizeof(*buffSending),0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
+				if(sent==-1){printf("fail to send msg back.\n");}
+				printf("ack de seqnum: %d envoyé\n", p.Seqnum);
+			
+			
 		}
 		else{printf("Dernier paquet envoyé.\n");}
 	
-
+		
 
 		
 

@@ -5,6 +5,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <poll.h>
+#include <sys/time.h>
 #include <zlib.h>
 
 
@@ -103,6 +104,7 @@ struct Buffer
 void display(Paquet p);
 void structToBuff(Paquet p, Buffer *b);
 void buffToStruct(Paquet *p, Buffer b);
+int is_time_out(struct timeval t, int timeout);
 //fin
 
 
@@ -232,11 +234,18 @@ int main (int argc, char **argv){
     //truc genre window seqnum
     int window=2;
     int windowSlide=window;
-    int timeout=1000;
+    int timeout=1000;//millisec
+    int timeoutPerso=1000;//microsec
     char *sendingBuffer[window];
     char *receivBuffer[528];
-    int seqnumtab[2]={-1};//valeur doit valoir window
+    int seqnumtab[2];//valeur doit valoir window
+   	for(int i=0;i<windowSlide;i++){
+   		seqnumtab[i]=-1;
+   	   	}
     int seqnum=0;
+    struct timeval timeSending[2];//same as just above
+    int nfull=0;
+    
 
 
 
@@ -249,7 +258,7 @@ int main (int argc, char **argv){
     //int payLenTest = getPayload((char*)payloadTest, file, 512);
 
 
-    while(payLen>0){
+    while(payLen>0 || nfull>0){
 
     	//poll
     	fds[0].fd=sock;
@@ -263,7 +272,8 @@ int main (int argc, char **argv){
 		int pret = poll(fds,fds_length,timeout);
 
 
-		if(pret>0){
+		if(pret>0 ){
+				int found =0;
 				//printf("%d\n",fds[1].events );
 				if(fds[1].revents==POLLOUT && window>0){
 					int num = seqnum++;
@@ -278,38 +288,61 @@ int main (int argc, char **argv){
 				    if(L == 0){
 				        shift = 1;
 				    }
-				    char * finalbuffer = malloc(sizeof(char)*(payLen+16-shift));
 				    
 
-					finalbuffer = packetGenerator(p,payload,payLen);
-
-
-				    memcpy(finalbuffer,packetGenerator(p,(char*)payload,payLen),sizeof(char)*(payLen+16-shift));
+				    char * finalbuffer;
+				    if(payLen>0){
+				    	finalbuffer = malloc(sizeof(char)*(payLen+16-shift));
+				    	finalbuffer = packetGenerator(p,payload,payLen);
+						memcpy(finalbuffer,packetGenerator(p,(char*)payload,payLen),sizeof(char)*(payLen+16-shift));
+				    }
+				    
 				  	
+
 				    for(int i=0;i<windowSlide;i++){
-				    	if(seqnumtab[i]==-1){
+				    	//check si timeout
+				    	if(seqnumtab[i]!=-1 && is_time_out(timeSending[i],timeoutPerso)){
+				    		printf("timeout dépassé i:%d\n",i);
+				    		gettimeofday(&timeSending[i],NULL);
+				    		sent = sendto(sock,sendingBuffer[i],sizeof(*sendingBuffer[i]),0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
+				    		}
+				    	
+				    	//check
+				    	if(seqnumtab[i]==-1 && found==0 && payLen>0){
 				    		seqnumtab[i]=num;
 				    		sendingBuffer[i]=finalbuffer;
+				    		gettimeofday(&timeSending[i],NULL);
+				    		printf("envoyé seqnum:%d,  i:%d\n",num,i);
+				    		found=1;
+				    		nfull++;//on rempli de un le seqnumtab
+				    		}
 				    	}
-				    }
+				    
+				    if(payLen>0){
+				    	//printf("envoyé seqnum:%d",num);
+				    	sent = sendto(sock,finalbuffer,payLen+16-shift,0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
+				    }	
+				    
 
-
-				    sent = sendto(sock,finalbuffer,payLen+16-shift,0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
 
 				    *payload =0;
 				    payLen = getPayload((char*)payload, file, 512);
 				    window--;
-				}
+					}
+				
 				else if(fds[0].events==1 && fds[0].revents==POLLIN){
 					
 					ssize_t reception = recvfrom(sock,receivBuffer,sizeof(receivBuffer),0,(struct sockaddr *)&peer2_addr,&peer2_len);
 					int seqnumReceiv = atoi((const char *)receivBuffer);
 					printf("ack %d\n", seqnumReceiv);
 					 for(int i=0;i<windowSlide;i++){
+					 	//printf("vérif seqnumtab:%d et seqnumReceiv:%d\n",seqnumtab[i],seqnumReceiv );
 				    	if(seqnumtab[i]==seqnumReceiv){
+				    		printf("libération du buffer pour le seqnum:%d\n",seqnumReceiv);
 				    		seqnumtab[i]=-1;
 				    		sendingBuffer[i]="\0";
 				    		window++;
+				    		nfull--;//on libère le seqnum
 				    		break;
 				    	}
 				    }
@@ -325,25 +358,6 @@ int main (int argc, char **argv){
     }
 
     
-//old
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -376,15 +390,23 @@ int main (int argc, char **argv){
     sent = sendto(sock,finalbuffer2,12-shift2,0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
 
 
-
-
-
-
-
-
-
-
     return 0;}
+
+
+
+ int is_time_out(struct timeval t, int timeout){
+  struct timeval stop;
+  gettimeofday(&stop,NULL);
+  time_t b = stop.tv_sec -t.tv_sec;
+  b*= 1000000;
+  time_t a = stop.tv_usec - t.tv_usec;
+  a+=b;
+ // printf("timelapse:%ld\n",a);
+  if(a>timeout){
+  	printf("timelapse:%ld\n",a);
+  	return 1;}
+    return 0;
+}
 
 //TODO check structure in binary for during execution
 void structToBuff(Paquet p, Buffer *b){
