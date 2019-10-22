@@ -295,7 +295,7 @@ int main (int argc, char **argv){
 				    char * finalbuffer;
 				    if(payLen>0){
 				    	finalbuffer = malloc(sizeof(char)*(payLen+16-shift));
-				    	finalbuffer = packetGenerator(p,payload,payLen);
+				    	//finalbuffer = packetGenerator(p,payload,payLen);
 						memcpy(finalbuffer,packetGenerator(p,(char*)payload,payLen),sizeof(char)*(payLen+16-shift));
 				    }
 				    
@@ -306,8 +306,8 @@ int main (int argc, char **argv){
 				    	if(seqnumtab[i]!=-1 && is_time_out(timeSending[i],timeoutPerso)){
 				    		printf("timeout dépassé i:%d\n",i);
 				    		gettimeofday(&timeSending[i],NULL);
-				    		//sent = sendto(sock,sendingBuffer[i],sizeof(*sendingBuffer[i]),0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
-				    		sent = sendto(sock,sendingBuffer[i],payLen+16-shift,0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
+				    		sent = sendto(sock,sendingBuffer[i],sizeof(*sendingBuffer[i]),0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
+				    		//sent = sendto(sock,sendingBuffer[i],payLen+16-shift,0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
 				    		if(sent==-1){printf("fail to resend.\n");}
 				    		}
 				    	
@@ -329,8 +329,11 @@ int main (int argc, char **argv){
 				    
 
 
-				    *payload =0;
+				   // *payload =0;
+				    //memcpy(payload,0, sizeof(char)*512);
+				    payLen = 0;
 				    payLen = getPayload((char*)payload, file, 512);
+				    printf("payload from file %d \n ", payLen);
 				    window--;
 					}
 				
@@ -355,7 +358,8 @@ int main (int argc, char **argv){
 				}
 			
 
-	
+
+
 		}
 
 	    
@@ -371,6 +375,7 @@ int main (int argc, char **argv){
     //cloture
     char * payload2[512] = {0};
 
+    printf("eof packet sending");
     int payLen2 = getPayload((char*)payload2, file, 512);
 
     int L2 = 0;
@@ -382,13 +387,13 @@ int main (int argc, char **argv){
         shift2 = 1;
     }
 
-    Paquet p2 = packetConstructor(1,0,0,0,0,1,32);
+    Paquet p2 = packetConstructor(1,0,window,0,0,seqnum++,31);
 
 
     char * finalbuffer2 = malloc(sizeof(char)*(12-shift2));
 //	finalbuffer = packetGenerator(p,payload,payLen);
 
-    memcpy(finalbuffer2,packetGenerator(p2,NULL,0),sizeof(char)*(16-shift2));
+    memcpy(finalbuffer2,packetGenerator(p2,NULL,0),sizeof(char)*(12-shift2));
 
 
 
