@@ -1,0 +1,3 @@
+/home/lobster/Documents/Sender/NetworkSender/Sender/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/lobster/Documents/Sender/NetworkSender/Sender/cmake-build-debug/CMakeFiles/Sender.dir
+/home/lobster/Documents/Sender/NetworkSender/Sender/cmake-build-debug/CMakeFiles/edit_cache.dir

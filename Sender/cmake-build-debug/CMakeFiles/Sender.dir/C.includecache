@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/lobster/Documents/Sender/NetworkSender/Sender/main.c
+stdio.h
+-
+sys/socket.h
+-
+string.h
+-
+arpa/inet.h
+-
+errno.h
+-
+stdlib.h
+-
+zlib.h
+-
+
