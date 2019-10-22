@@ -236,7 +236,7 @@ int main (int argc, char **argv){
     int windowSlide=window;
     int timeout=1000;//millisec
     int timeoutPerso=1000;//microsec
-    char *sendingBuffer[window];
+    char **sendingBuffer[windowSlide];
     char *receivBuffer[528];
     int seqnumtab[2];//valeur doit valoir window
    	for(int i=0;i<windowSlide;i++){
@@ -305,6 +305,7 @@ int main (int argc, char **argv){
 				    		printf("timeout dépassé i:%d\n",i);
 				    		gettimeofday(&timeSending[i],NULL);
 				    		sent = sendto(sock,sendingBuffer[i],sizeof(*sendingBuffer[i]),0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
+				    		if(sent==-1){printf("fail to resend.\n");}
 				    		}
 				    	
 				    	//check

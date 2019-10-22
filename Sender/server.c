@@ -86,11 +86,13 @@ int main (int argc, char **argv){
 			buffToStruct(&p,buff);
 			display(p);
 			sprintf(buffSending,"%d",p.Seqnum);
-			
+			printf("found :%d\n",found);	
+			if(found!=2){
 				ssize_t sent = sendto(sock,buffSending,sizeof(*buffSending),0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
 				if(sent==-1){printf("fail to send msg back.\n");}
 				printf("ack de seqnum: %d envoyé\n", p.Seqnum);
-			
+			}
+			found++;
 			
 		}
 		else{printf("Dernier paquet envoyé.\n");}
