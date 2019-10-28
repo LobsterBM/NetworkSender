@@ -1,0 +1,141 @@
+commit 2ffbc9dc35a40736c6400843414f14b8f5c811d1
+Author: Lobster <sindrassil@gmail.com>
+Date:   Tue Oct 22 17:06:05 2019 +0200
+
+    restructuration and removed prints
+
+ Sender/.idea/workspace.xml           |    1 +
+ Sender/Makefile                      |   17 +
+ Sender/sender                        |  Bin 0 -> 17840 bytes
+ Sender/src/client.c                  |  244 ++++++++
+ Sender/{client.c => src/functions.c} | 1054 ++++++++++++++--------------------
+ Sender/src/functions.h               |   62 ++
+ Sender/test                          |  Bin 0 -> 17968 bytes
+ Sender/tests/test.c                  |   72 +++
+ 8 files changed, 827 insertions(+), 623 deletions(-)
+
+commit ee7f803cd3d09803ee3c5bb0714120c8a7e1592d
+Author: Lobster <sindrassil@gmail.com>
+Date:   Tue Oct 22 16:32:23 2019 +0200
+
+    .
+    
+    format restructure
+    makefile updated
+
+ Sender/.idea/workspace.xml                         |  13 ++---
+ Sender/CMakeLists.txt                              |   2 +-
+ Sender/clentExe                                    | Bin 0 -> 17800 bytes
+ Sender/client.c                                    |  19 ++++---
+ Sender/clientExe                                   | Bin 17800 -> 17800 bytes
+ Sender/cmake-build-debug/CMakeFiles/Makefile2      |   4 +-
+ .../CMakeFiles/Sender.dir/DependInfo.cmake         |   2 +
+ .../CMakeFiles/Sender.dir/build.make               |  34 +++++++++++-
+ .../CMakeFiles/Sender.dir/cmake_clean.cmake        |   2 +
+ .../CMakeFiles/Sender.dir/link.txt                 |   2 +-
+ .../CMakeFiles/Sender.dir/progress.make            |   2 +
+ Sender/cmake-build-debug/CMakeFiles/progress.marks |   2 +-
+ Sender/cmake-build-debug/Makefile                  |  60 +++++++++++++++++++++
+ Sender/cmake-build-debug/Sender.cbp                |   6 +++
+ 14 files changed, 126 insertions(+), 22 deletions(-)
+
+commit 04857cd22f2a54a2d2f43b42a990cd57a4bf97c3
+Author: zethib987 <thibault.vereerstraeten@student.uclouvain.be>
+Date:   Tue Oct 22 15:19:45 2019 +0200
+
+    ack/timer loss resistance avec full packet
+
+ Sender/client.c  |  29 ++++++++++-----
+ Sender/clientExe | Bin 17800 -> 17800 bytes
+ Sender/server.c  | 108 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ Sender/serverExe | Bin 12928 -> 13208 bytes
+ 4 files changed, 125 insertions(+), 12 deletions(-)
+
+commit d8e055231931b8f0162a3f99ef73f9fe74217323
+Author: zethib987 <thibault.vereerstraeten@student.uclouvain.be>
+Date:   Tue Oct 22 13:05:58 2019 +0200
+
+    ack/timer résistant au perte (en théorie)
+
+ Sender/client.c  |   3 ++-
+ Sender/clientExe | Bin 17800 -> 17800 bytes
+ Sender/server.c  |   6 ++++--
+ Sender/serverExe | Bin 12928 -> 12928 bytes
+ 4 files changed, 6 insertions(+), 3 deletions(-)
+
+commit 229575e2e3af7468725ac4b40d739c4228a67ba2
+Author: zethib987 <thibault.vereerstraeten@student.uclouvain.be>
+Date:   Tue Oct 22 12:12:22 2019 +0200
+
+    ack avec timer simple
+
+ Sender/client.c  | 100 +++++++++++++++++++++++++++++++++----------------------
+ Sender/clientExe | Bin 17712 -> 17800 bytes
+ Sender/server.c  |  15 ++++++---
+ Sender/serverExe | Bin 12928 -> 12928 bytes
+ 4 files changed, 71 insertions(+), 44 deletions(-)
+
+commit 33e9fe66b3be95d2cb0ae0bd6d11518a69459376
+Author: zethib987 <thibault.vereerstraeten@student.uclouvain.be>
+Date:   Tue Oct 22 08:23:19 2019 +0200
+
+    ack sans timer
+
+ README.md                                          |    1 +
+ Sender/.idea/Sender.iml                            |    2 +
+ Sender/.idea/deployment.xml                        |   14 +
+ Sender/.idea/encodings.xml                         |    4 +
+ Sender/.idea/misc.xml                              |    7 +
+ Sender/.idea/modules.xml                           |    8 +
+ Sender/.idea/vcs.xml                               |    6 +
+ Sender/.idea/workspace.xml                         |  145 ++
+ Sender/CMakeLists.txt                              |    9 +
+ Sender/client.c                                    |  584 ++++++
+ Sender/clientExe                                   |  Bin 0 -> 17712 bytes
+ Sender/cmake-build-debug/CMakeCache.txt            |  334 ++++
+ .../CMakeFiles/3.15.3/CMakeCCompiler.cmake         |   76 +
+ .../3.15.3/CMakeDetermineCompilerABI_C.bin         |  Bin 0 -> 8248 bytes
+ .../CMakeFiles/3.15.3/CMakeSystem.cmake            |   15 +
+ .../3.15.3/CompilerIdC/CMakeCCompilerId.c          |  665 +++++++
+ .../CMakeFiles/3.15.3/CompilerIdC/a.out            |  Bin 0 -> 8408 bytes
+ .../CMakeFiles/CMakeDirectoryInformation.cmake     |   16 +
+ .../cmake-build-debug/CMakeFiles/CMakeOutput.log   |  229 +++
+ Sender/cmake-build-debug/CMakeFiles/Makefile.cmake |   48 +
+ Sender/cmake-build-debug/CMakeFiles/Makefile2      |  106 ++
+ Sender/cmake-build-debug/CMakeFiles/Progress/1     |    1 +
+ Sender/cmake-build-debug/CMakeFiles/Progress/2     |    1 +
+ .../CMakeFiles/Progress/count.txt                  |    1 +
+ .../CMakeFiles/Sender.dir/C.includecache           |   24 +
+ .../CMakeFiles/Sender.dir/DependInfo.cmake         |   20 +
+ .../CMakeFiles/Sender.dir/build.make               |   98 +
+ .../CMakeFiles/Sender.dir/client.c.o               |  Bin 0 -> 14168 bytes
+ .../CMakeFiles/Sender.dir/cmake_clean.cmake        |   10 +
+ .../CMakeFiles/Sender.dir/depend.internal          |    5 +
+ .../CMakeFiles/Sender.dir/depend.make              |    5 +
+ .../CMakeFiles/Sender.dir/flags.make               |   10 +
+ .../CMakeFiles/Sender.dir/link.txt                 |    1 +
+ .../CMakeFiles/Sender.dir/main.c.o                 |  Bin 0 -> 20080 bytes
+ .../CMakeFiles/Sender.dir/progress.make            |    3 +
+ .../CMakeFiles/Sender.dir/server.c.o               |  Bin 0 -> 14928 bytes
+ .../CMakeFiles/TargetDirectories.txt               |    3 +
+ .../CMakeFiles/clion-environment.txt               |    3 +
+ Sender/cmake-build-debug/CMakeFiles/clion-log.txt  |    4 +
+ .../cmake-build-debug/CMakeFiles/cmake.check_cache |    1 +
+ Sender/cmake-build-debug/CMakeFiles/progress.marks |    1 +
+ Sender/cmake-build-debug/Makefile                  |  178 ++
+ Sender/cmake-build-debug/Sender.cbp                |   88 +
+ Sender/cmake-build-debug/cmake_install.cmake       |   49 +
+ Sender/crctest.txt                                 |    0
+ Sender/longText.txt                                |   22 +
+ Sender/main.c                                      |  514 ++++++
+ Sender/mainE                                       |  Bin 0 -> 17624 bytes
+ Sender/payload.txt                                 |    1 +
+ Sender/receiverRef                                 |  Bin 0 -> 40416 bytes
+ Sender/senderRef                                   |  Bin 0 -> 35024 bytes
+ Sender/server                                      |  Bin 0 -> 12936 bytes
+ Sender/server.c                                    |  304 ++++
+ Sender/serverExe                                   |  Bin 0 -> 12928 bytes
+ Sender/test.txt                                    |    1 +
+ Sender/zlib.h                                      | 1912 ++++++++++++++++++++
+ test.txt                                           |    1 +
+ 57 files changed, 5530 insertions(+)
