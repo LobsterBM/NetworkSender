@@ -1,7 +1,6 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/Sender.dir/client.c.o"
-  "CMakeFiles/Sender.dir/main.c.o"
-  "CMakeFiles/Sender.dir/server.c.o"
+  "CMakeFiles/Sender.dir/src/client.c.o"
+  "CMakeFiles/Sender.dir/src/functions.c.o"
   "Sender"
   "Sender.pdb"
 )

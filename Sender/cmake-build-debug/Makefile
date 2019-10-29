@@ -123,86 +123,59 @@ Sender/fast:
 	$(MAKE) -f CMakeFiles/Sender.dir/build.make CMakeFiles/Sender.dir/build
 .PHONY : Sender/fast
 
-client.o: client.c.o
+src/client.o: src/client.c.o
 
-.PHONY : client.o
-
-# target to build an object file
-client.c.o:
-	$(MAKE) -f CMakeFiles/Sender.dir/build.make CMakeFiles/Sender.dir/client.c.o
-.PHONY : client.c.o
-
-client.i: client.c.i
-
-.PHONY : client.i
-
-# target to preprocess a source file
-client.c.i:
-	$(MAKE) -f CMakeFiles/Sender.dir/build.make CMakeFiles/Sender.dir/client.c.i
-.PHONY : client.c.i
-
-client.s: client.c.s
-
-.PHONY : client.s
-
-# target to generate assembly for a file
-client.c.s:
-	$(MAKE) -f CMakeFiles/Sender.dir/build.make CMakeFiles/Sender.dir/client.c.s
-.PHONY : client.c.s
-
-main.o: main.c.o
-
-.PHONY : main.o
+.PHONY : src/client.o
 
 # target to build an object file
-main.c.o:
-	$(MAKE) -f CMakeFiles/Sender.dir/build.make CMakeFiles/Sender.dir/main.c.o
-.PHONY : main.c.o
+src/client.c.o:
+	$(MAKE) -f CMakeFiles/Sender.dir/build.make CMakeFiles/Sender.dir/src/client.c.o
+.PHONY : src/client.c.o
 
-main.i: main.c.i
+src/client.i: src/client.c.i
 
-.PHONY : main.i
+.PHONY : src/client.i
 
 # target to preprocess a source file
-main.c.i:
-	$(MAKE) -f CMakeFiles/Sender.dir/build.make CMakeFiles/Sender.dir/main.c.i
-.PHONY : main.c.i
+src/client.c.i:
+	$(MAKE) -f CMakeFiles/Sender.dir/build.make CMakeFiles/Sender.dir/src/client.c.i
+.PHONY : src/client.c.i
 
-main.s: main.c.s
+src/client.s: src/client.c.s
 
-.PHONY : main.s
+.PHONY : src/client.s
 
 # target to generate assembly for a file
-main.c.s:
-	$(MAKE) -f CMakeFiles/Sender.dir/build.make CMakeFiles/Sender.dir/main.c.s
-.PHONY : main.c.s
+src/client.c.s:
+	$(MAKE) -f CMakeFiles/Sender.dir/build.make CMakeFiles/Sender.dir/src/client.c.s
+.PHONY : src/client.c.s
 
-server.o: server.c.o
+src/functions.o: src/functions.c.o
 
-.PHONY : server.o
+.PHONY : src/functions.o
 
 # target to build an object file
-server.c.o:
-	$(MAKE) -f CMakeFiles/Sender.dir/build.make CMakeFiles/Sender.dir/server.c.o
-.PHONY : server.c.o
+src/functions.c.o:
+	$(MAKE) -f CMakeFiles/Sender.dir/build.make CMakeFiles/Sender.dir/src/functions.c.o
+.PHONY : src/functions.c.o
 
-server.i: server.c.i
+src/functions.i: src/functions.c.i
 
-.PHONY : server.i
+.PHONY : src/functions.i
 
 # target to preprocess a source file
-server.c.i:
-	$(MAKE) -f CMakeFiles/Sender.dir/build.make CMakeFiles/Sender.dir/server.c.i
-.PHONY : server.c.i
+src/functions.c.i:
+	$(MAKE) -f CMakeFiles/Sender.dir/build.make CMakeFiles/Sender.dir/src/functions.c.i
+.PHONY : src/functions.c.i
 
-server.s: server.c.s
+src/functions.s: src/functions.c.s
 
-.PHONY : server.s
+.PHONY : src/functions.s
 
 # target to generate assembly for a file
-server.c.s:
-	$(MAKE) -f CMakeFiles/Sender.dir/build.make CMakeFiles/Sender.dir/server.c.s
-.PHONY : server.c.s
+src/functions.c.s:
+	$(MAKE) -f CMakeFiles/Sender.dir/build.make CMakeFiles/Sender.dir/src/functions.c.s
+.PHONY : src/functions.c.s
 
 # Help Target
 help:
@@ -213,15 +186,12 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... Sender"
 	@echo "... edit_cache"
-	@echo "... client.o"
-	@echo "... client.i"
-	@echo "... client.s"
-	@echo "... main.o"
-	@echo "... main.i"
-	@echo "... main.s"
-	@echo "... server.o"
-	@echo "... server.i"
-	@echo "... server.s"
+	@echo "... src/client.o"
+	@echo "... src/client.i"
+	@echo "... src/client.s"
+	@echo "... src/functions.o"
+	@echo "... src/functions.i"
+	@echo "... src/functions.s"
 .PHONY : help
 
 

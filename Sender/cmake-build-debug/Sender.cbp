@@ -78,13 +78,13 @@
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/home/lobster/Documents/Sender/NetworkSender/Sender/client.c">
+		<Unit filename="/home/lobster/Documents/Sender/NetworkSender/Sender/src/client.c">
 			<Option target="Sender"/>
 		</Unit>
-		<Unit filename="/home/lobster/Documents/Sender/NetworkSender/Sender/main.c">
+		<Unit filename="/home/lobster/Documents/Sender/NetworkSender/Sender/src/functions.c">
 			<Option target="Sender"/>
 		</Unit>
-		<Unit filename="/home/lobster/Documents/Sender/NetworkSender/Sender/server.c">
+		<Unit filename="/home/lobster/Documents/Sender/NetworkSender/Sender/src/functions.h">
 			<Option target="Sender"/>
 		</Unit>
 		<Unit filename="/home/lobster/Documents/Sender/NetworkSender/Sender/CMakeLists.txt">

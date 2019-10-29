@@ -83,11 +83,12 @@ int main (int argc, char **argv){
     int seqnum=0;
     struct timeval timeSending[2];//same as just above
     int nfull=0;
-    
 
 
 
-    
+
+
+    receivBuffer.content = malloc(528*sizeof(char));
     ssize_t sent=0;
     char * payload[512] = {0};
     //char * payloadTest[512] = "yolo.";
@@ -132,7 +133,9 @@ int main (int argc, char **argv){
 				    if(payLen>0){
 				    	finalbuffer = malloc(sizeof(char)*(payLen+16-shift));
 				    	//finalbuffer = packetGenerator(p,payload,payLen);
-						memcpy(finalbuffer,packetGenerator(p,(char*)payload,payLen),sizeof(char)*(payLen+16-shift));
+				    	char * temp = packetGenerator(p,(char*)payload,payLen);
+						memcpy(finalbuffer,temp,sizeof(char)*(payLen+16-shift));
+						free(temp);
 				    }
 				    
 				  	
@@ -143,6 +146,7 @@ int main (int argc, char **argv){
 				    		//fprintf(stderr,"timeout dépassé i:%d\n",i);
 				    		gettimeofday(&timeSending[i],NULL);
 				    		sent = sendto(sock,sendingBuffer[i],sizeof(*sendingBuffer[i]),0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
+				    		//free(sendingBuffer[i]);
 				    		//sent = sendto(sock,sendingBuffer[i],payLen+16-shift,0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
 				    		if(sent==-1){fprintf(stderr,"fail to resend.\n");}
 				    		}
@@ -161,6 +165,7 @@ int main (int argc, char **argv){
 				    if(payLen>0){
 				    	//printf("envoyé seqnum:%d",num);
 				    	sent = sendto(sock,finalbuffer,payLen+16-shift,0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
+				    	free(finalbuffer);
 				    }	
 				    
 
@@ -174,7 +179,7 @@ int main (int argc, char **argv){
 					}
 				
 				else if(fds[0].events==1 && fds[0].revents==POLLIN){
-					receivBuffer.content = calloc(528,sizeof(char));
+					receivBuffer.content = realloc(receivBuffer.content,528*sizeof(char));
 					ssize_t reception = recvfrom(sock,receivBuffer.content,sizeof(receivBuffer.content),0,(struct sockaddr *)&peer2_addr,&peer2_len);
 					//int seqnumReceiv = atoi((const char *)receivBuffer);
 					buffToStruct(&receivPacket,receivBuffer);
@@ -228,14 +233,17 @@ int main (int argc, char **argv){
 
     char * finalbuffer2 = malloc(sizeof(char)*(12-shift2));
 //	finalbuffer = packetGenerator(p,payload,payLen);
+    char* temp2 = packetGenerator(p2,NULL,0);
+    memcpy(finalbuffer2,temp2,sizeof(char)*(12-shift2));
+    free(temp2);
 
-    memcpy(finalbuffer2,packetGenerator(p2,NULL,0),sizeof(char)*(12-shift2));
 
-
-
-
+    free(receivBuffer.content);
+    free(argv);
     sent = sendto(sock,finalbuffer2,12-shift2,0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
-
+    free(finalbuffer2);
+    free(sendingBuffer);
+    fclose(file);
     printf("Success! \n");
 
     return 0;}

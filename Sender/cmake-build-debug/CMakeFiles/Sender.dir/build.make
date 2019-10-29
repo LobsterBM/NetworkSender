@@ -57,60 +57,45 @@ include CMakeFiles/Sender.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/Sender.dir/flags.make
 
-CMakeFiles/Sender.dir/main.c.o: CMakeFiles/Sender.dir/flags.make
-CMakeFiles/Sender.dir/main.c.o: ../main.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lobster/Documents/Sender/NetworkSender/Sender/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/Sender.dir/main.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/Sender.dir/main.c.o   -c /home/lobster/Documents/Sender/NetworkSender/Sender/main.c
+CMakeFiles/Sender.dir/src/client.c.o: CMakeFiles/Sender.dir/flags.make
+CMakeFiles/Sender.dir/src/client.c.o: ../src/client.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lobster/Documents/Sender/NetworkSender/Sender/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/Sender.dir/src/client.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/Sender.dir/src/client.c.o   -c /home/lobster/Documents/Sender/NetworkSender/Sender/src/client.c
 
-CMakeFiles/Sender.dir/main.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/Sender.dir/main.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/lobster/Documents/Sender/NetworkSender/Sender/main.c > CMakeFiles/Sender.dir/main.c.i
+CMakeFiles/Sender.dir/src/client.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/Sender.dir/src/client.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/lobster/Documents/Sender/NetworkSender/Sender/src/client.c > CMakeFiles/Sender.dir/src/client.c.i
 
-CMakeFiles/Sender.dir/main.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/Sender.dir/main.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/lobster/Documents/Sender/NetworkSender/Sender/main.c -o CMakeFiles/Sender.dir/main.c.s
+CMakeFiles/Sender.dir/src/client.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/Sender.dir/src/client.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/lobster/Documents/Sender/NetworkSender/Sender/src/client.c -o CMakeFiles/Sender.dir/src/client.c.s
 
-CMakeFiles/Sender.dir/client.c.o: CMakeFiles/Sender.dir/flags.make
-CMakeFiles/Sender.dir/client.c.o: ../client.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lobster/Documents/Sender/NetworkSender/Sender/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/Sender.dir/client.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/Sender.dir/client.c.o   -c /home/lobster/Documents/Sender/NetworkSender/Sender/client.c
+CMakeFiles/Sender.dir/src/functions.c.o: CMakeFiles/Sender.dir/flags.make
+CMakeFiles/Sender.dir/src/functions.c.o: ../src/functions.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lobster/Documents/Sender/NetworkSender/Sender/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/Sender.dir/src/functions.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/Sender.dir/src/functions.c.o   -c /home/lobster/Documents/Sender/NetworkSender/Sender/src/functions.c
 
-CMakeFiles/Sender.dir/client.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/Sender.dir/client.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/lobster/Documents/Sender/NetworkSender/Sender/client.c > CMakeFiles/Sender.dir/client.c.i
+CMakeFiles/Sender.dir/src/functions.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/Sender.dir/src/functions.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/lobster/Documents/Sender/NetworkSender/Sender/src/functions.c > CMakeFiles/Sender.dir/src/functions.c.i
 
-CMakeFiles/Sender.dir/client.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/Sender.dir/client.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/lobster/Documents/Sender/NetworkSender/Sender/client.c -o CMakeFiles/Sender.dir/client.c.s
-
-CMakeFiles/Sender.dir/server.c.o: CMakeFiles/Sender.dir/flags.make
-CMakeFiles/Sender.dir/server.c.o: ../server.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lobster/Documents/Sender/NetworkSender/Sender/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/Sender.dir/server.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/Sender.dir/server.c.o   -c /home/lobster/Documents/Sender/NetworkSender/Sender/server.c
-
-CMakeFiles/Sender.dir/server.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/Sender.dir/server.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/lobster/Documents/Sender/NetworkSender/Sender/server.c > CMakeFiles/Sender.dir/server.c.i
-
-CMakeFiles/Sender.dir/server.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/Sender.dir/server.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/lobster/Documents/Sender/NetworkSender/Sender/server.c -o CMakeFiles/Sender.dir/server.c.s
+CMakeFiles/Sender.dir/src/functions.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/Sender.dir/src/functions.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/lobster/Documents/Sender/NetworkSender/Sender/src/functions.c -o CMakeFiles/Sender.dir/src/functions.c.s
 
 # Object files for target Sender
 Sender_OBJECTS = \
-"CMakeFiles/Sender.dir/main.c.o" \
-"CMakeFiles/Sender.dir/client.c.o" \
-"CMakeFiles/Sender.dir/server.c.o"
+"CMakeFiles/Sender.dir/src/client.c.o" \
+"CMakeFiles/Sender.dir/src/functions.c.o"
 
 # External object files for target Sender
 Sender_EXTERNAL_OBJECTS =
 
-Sender: CMakeFiles/Sender.dir/main.c.o
-Sender: CMakeFiles/Sender.dir/client.c.o
-Sender: CMakeFiles/Sender.dir/server.c.o
+Sender: CMakeFiles/Sender.dir/src/client.c.o
+Sender: CMakeFiles/Sender.dir/src/functions.c.o
 Sender: CMakeFiles/Sender.dir/build.make
 Sender: CMakeFiles/Sender.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/lobster/Documents/Sender/NetworkSender/Sender/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking C executable Sender"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/lobster/Documents/Sender/NetworkSender/Sender/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking C executable Sender"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/Sender.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

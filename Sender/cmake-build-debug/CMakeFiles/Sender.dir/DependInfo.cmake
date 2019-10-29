@@ -4,9 +4,8 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
-  "/home/lobster/Documents/Sender/NetworkSender/Sender/client.c" "/home/lobster/Documents/Sender/NetworkSender/Sender/cmake-build-debug/CMakeFiles/Sender.dir/client.c.o"
-  "/home/lobster/Documents/Sender/NetworkSender/Sender/main.c" "/home/lobster/Documents/Sender/NetworkSender/Sender/cmake-build-debug/CMakeFiles/Sender.dir/main.c.o"
-  "/home/lobster/Documents/Sender/NetworkSender/Sender/server.c" "/home/lobster/Documents/Sender/NetworkSender/Sender/cmake-build-debug/CMakeFiles/Sender.dir/server.c.o"
+  "/home/lobster/Documents/Sender/NetworkSender/Sender/src/client.c" "/home/lobster/Documents/Sender/NetworkSender/Sender/cmake-build-debug/CMakeFiles/Sender.dir/src/client.c.o"
+  "/home/lobster/Documents/Sender/NetworkSender/Sender/src/functions.c" "/home/lobster/Documents/Sender/NetworkSender/Sender/cmake-build-debug/CMakeFiles/Sender.dir/src/functions.c.o"
   )
 set(CMAKE_C_COMPILER_ID "GNU")
 
