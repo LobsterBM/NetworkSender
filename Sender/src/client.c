@@ -146,7 +146,7 @@ int main (int argc, char **argv){
 				    		//fprintf(stderr,"timeout dépassé i:%d\n",i);
 				    		gettimeofday(&timeSending[i],NULL);
 				    		sent = sendto(sock,sendingBuffer[i],sizeof(*sendingBuffer[i]),0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
-				    		//free(sendingBuffer[i]);
+				    		free(sendingBuffer[i]);
 				    		//sent = sendto(sock,sendingBuffer[i],payLen+16-shift,0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
 				    		if(sent==-1){fprintf(stderr,"fail to resend.\n");}
 				    		}
@@ -239,10 +239,10 @@ int main (int argc, char **argv){
 
 
     free(receivBuffer.content);
-    free(argv);
+
     sent = sendto(sock,finalbuffer2,12-shift2,0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
     free(finalbuffer2);
-    free(sendingBuffer);
+   // free(sendingBuffer);
     fclose(file);
     printf("Success! \n");
 

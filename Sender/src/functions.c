@@ -209,7 +209,9 @@ char * packetGenerator ( Paquet p , char * payload , int payloadLen){
 
    // printf("\n crc 2 post add : %lu \n" , (uLong) packet[payloadLen+12-shift+1] );
     free(headBuff.content);
-    free(payload);
+
+
+
     return packet;
 
 
