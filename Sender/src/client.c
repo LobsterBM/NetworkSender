@@ -192,8 +192,7 @@ int main (int argc, char **argv){
 					printf("ack %d\n", receivPacket.Seqnum);
 					printf("seqnumtab[0]:%d\n",seqnumtab[0]);
 					printf("seqnumtab[1]:%d\n",seqnumtab[1]);
-					//if(receivPacket.type==2){// est-ce bien un ack?	
-					if(1){
+					if(receivPacket.type==2){// est-ce bien un ack?	
 						 for(int i=0;i<windowSlide;i++){
 						 	//printf("lastAck:%d\n",lastAck);
 						 	
