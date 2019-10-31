@@ -93,7 +93,7 @@ int main (int argc, char **argv){
 			
 
 			buffToStruct(&p,buff);
-			display(p);
+			//display(p);
 			//sprintf(buffSending,"%d",p.Seqnum);
 			printf("found :%d\n",found);	
 			p2 = packetConstructor(2,0,5,0,0,p.Seqnum,4);

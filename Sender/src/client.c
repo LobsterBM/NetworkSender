@@ -71,18 +71,20 @@ int main (int argc, char **argv){
     int window=2;
     int windowSlide=window;
     int timeout=1000;//millisec
-    int timeoutPerso=1000;//microsec
+    int timeoutPerso=2000;//microsec
     char **sendingBuffer[windowSlide];
     //char *receivBuffer[528];
     Paquet receivPacket;
     Buffer receivBuffer;
-    int seqnumtab[2];//valeur doit valoir window
+    int seqnumtab[windowSlide];//valeur doit valoir window
    	for(int i=0;i<windowSlide;i++){
    		seqnumtab[i]=-1;
    	   	}
     int seqnum=0;
     struct timeval timeSending[2];//same as just above
+    struct timeval nowTime;
     int nfull=0;
+    int lastAck = -1;
 
 
 
@@ -115,13 +117,16 @@ int main (int argc, char **argv){
 				int found =0;
 				//printf("%d\n",fds[1].events );
 				if(fds[1].revents==POLLOUT && window>0){
-					int num = seqnum++;
+					int num;
+					if(seqnum<=255){num = seqnum++;}
+					else{num=0;seqnum=0;printf("boucle\n");}
+
 					int L = 0;
 				    if(payLen >= 128){
 				        L = 1;
 				    }
-
-				    Paquet p = packetConstructor(1,0,1,L,payLen,num,3);//type,TR,window,L,length,seqnum,timestamp
+ 					gettimeofday(&nowTime,NULL);
+				    Paquet p = packetConstructor(1,0,31,L,payLen,num,nowTime.tv_sec);//type,TR,window,L,length,seqnum,timestamp
 
 				    int shift = 0 ;
 				    if(L == 0){
@@ -143,7 +148,7 @@ int main (int argc, char **argv){
 				    for(int i=0;i<windowSlide;i++){
 				    	//check si timeout
 				    	if(seqnumtab[i]!=-1 && is_time_out(timeSending[i],timeoutPerso)){
-				    		//fprintf(stderr,"timeout dépassé i:%d\n",i);
+				    		fprintf(stderr,"timeout dépassé i:%d\n",i);
 				    		gettimeofday(&timeSending[i],NULL);
 				    		sent = sendto(sock,sendingBuffer[i],sizeof(*sendingBuffer[i]),0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
 				    		free(sendingBuffer[i]);
@@ -179,23 +184,42 @@ int main (int argc, char **argv){
 					}
 				
 				else if(fds[0].events==1 && fds[0].revents==POLLIN){
-					receivBuffer.content = realloc(receivBuffer.content,528*sizeof(char));
+					receivBuffer.content = calloc(528,sizeof(char));//528 = nombre de bytes max d'un paquet
 					ssize_t reception = recvfrom(sock,receivBuffer.content,sizeof(receivBuffer.content),0,(struct sockaddr *)&peer2_addr,&peer2_len);
 					//int seqnumReceiv = atoi((const char *)receivBuffer);
 					buffToStruct(&receivPacket,receivBuffer);
 					//display(receivPacket);
-					//printf("ack %d\n", receivPacket.Seqnum);
-					 for(int i=0;i<windowSlide;i++){
+					printf("ack %d\n", receivPacket.Seqnum);
+					printf("seqnumtab[0]:%d\n",seqnumtab[0]);
+					printf("seqnumtab[1]:%d\n",seqnumtab[1]);
+					//if(receivPacket.type==2){// est-ce bien un ack?	
+					if(1){
+						 for(int i=0;i<windowSlide;i++){
+						 	//printf("lastAck:%d\n",lastAck);
+						 	
 					 	//printf("vérif seqnumtab:%d et seqnumReceiv:%d\n",seqnumtab[i],seqnumReceiv );
-				    	if(seqnumtab[i]==receivPacket.Seqnum){
-				    		//printf("libération du buffer pour le seqnum:%d\n",receivPacket.Seqnum);
-				    		seqnumtab[i]=-1;
-				    		sendingBuffer[i]="\0";
-				    		window++;
-				    		nfull--;//on libère le seqnum
-				    		break;
+					    	if(lastAck<receivPacket.Seqnum){//cas normal
+					    		if(seqnumtab[i]<=receivPacket.Seqnum && seqnumtab[i]>lastAck){
+					    		printf("libération du buffer pour le seqnum:%d\n",seqnumtab[i]);
+					    		seqnumtab[i]=-1;
+					    		sendingBuffer[i]="\0";
+					    		window++;
+					    		nfull--;//on libère le seqnum
+					    		} 
+                            }					    	
+                            else{//cas spécial
+                            	if(seqnumtab[i]>=0 && (seqnumtab[i]<=receivPacket.Seqnum || seqnumtab[i]>=lastAck)){
+					    		printf("libération du buffer pour le seqnum:%d\n",seqnumtab[i]);
+					    		seqnumtab[i]=-1;
+					    		sendingBuffer[i]="\0";
+					    		window++;
+					    		nfull--;//on libère le seqnum
+					    		} 
+					    	}
 				    	}
-				    }
+				    lastAck=receivPacket.Seqnum;
+					}
+
 				}
 			
 
