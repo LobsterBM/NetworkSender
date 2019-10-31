@@ -264,7 +264,7 @@ int main (int argc, char **argv){
         shift2 = 1;
     }
    
-    Paquet p2 = packetConstructor(1,0,window,0,0,seqnum++,31);
+    Paquet p2 = packetConstructor(1,0,31,0,0,seqnum++,31);
 
 
     char * finalbuffer2 = malloc(sizeof(char)*(12-shift2));
