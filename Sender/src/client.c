@@ -68,7 +68,7 @@ int main (int argc, char **argv){
     struct pollfd fds[fds_length];
 
     //truc genre window seqnum
-    int window=2;
+    int window=31;
     int windowSlide=window;
     int timeout=1000;//millisec
     int timeoutPerso=2000;//microsec
@@ -81,10 +81,11 @@ int main (int argc, char **argv){
    		seqnumtab[i]=-1;
    	   	}
     int seqnum=0;
-    struct timeval timeSending[2];//same as just above
+    struct timeval timeSending[windowSlide];//same as just above
     struct timeval nowTime;
     int nfull=0;
     int lastAck = -1;
+    int lastSent= -1;
 
 
 
@@ -118,8 +119,10 @@ int main (int argc, char **argv){
 				//printf("%d\n",fds[1].events );
 				if(fds[1].revents==POLLOUT && window>0){
 					int num;
-					if(seqnum<=255){num = seqnum++;}
-					else{num=0;seqnum=0;printf("boucle\n");}
+					if(payLen>0){
+						if(seqnum<=255){num = seqnum++;}
+						else{num=0;seqnum=0;printf("boucle\n");}
+					}
 
 					int L = 0;
 				    if(payLen >= 128){
@@ -149,8 +152,10 @@ int main (int argc, char **argv){
 				    	//check si timeout
 				    	if(seqnumtab[i]!=-1 && is_time_out(timeSending[i],timeoutPerso)){
 				    		fprintf(stderr,"timeout dépassé i:%d\n",i);
+				    		lastSent =seqnumtab[i];
 				    		gettimeofday(&timeSending[i],NULL);
 				    		sent = sendto(sock,sendingBuffer[i],sizeof(*sendingBuffer[i]),0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
+
 				    		free(sendingBuffer[i]);
 				    		//sent = sendto(sock,sendingBuffer[i],payLen+16-shift,0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
 				    		if(sent==-1){fprintf(stderr,"fail to resend.\n");}
@@ -169,6 +174,8 @@ int main (int argc, char **argv){
 				    
 				    if(payLen>0){
 				    	//printf("envoyé seqnum:%d",num);
+				    	lastSent=num;
+				    	//printf("lastSent:%d\n", lastSent);
 				    	sent = sendto(sock,finalbuffer,payLen+16-shift,0,(const struct sockaddr *)&peer_addr, sizeof(peer_addr));
 				    	free(finalbuffer);
 				    }	
@@ -189,10 +196,16 @@ int main (int argc, char **argv){
 					//int seqnumReceiv = atoi((const char *)receivBuffer);
 					buffToStruct(&receivPacket,receivBuffer);
 					//display(receivPacket);
+					window = receivPacket.window - (lastSent-receivPacket.Seqnum);
 					printf("ack %d\n", receivPacket.Seqnum);
-					printf("seqnumtab[0]:%d\n",seqnumtab[0]);
-					printf("seqnumtab[1]:%d\n",seqnumtab[1]);
-					if(receivPacket.type==2){// est-ce bien un ack?	
+					for(int i=0;i<31;i++){
+						printf("seqnumtab[%d]:%d\n",i,seqnumtab[i]);
+					}
+					
+					
+					printf("window :%d\n", window);
+					//if(receivPacket.type==2){// est-ce bien un ack?	
+						if(1){
 						 for(int i=0;i<windowSlide;i++){
 						 	//printf("lastAck:%d\n",lastAck);
 						 	
@@ -220,14 +233,14 @@ int main (int argc, char **argv){
 					}
 
 				}
-			
 
 
 
 		}
 
-	    if(payLen == 0){
+	    else if(payLen == 0){
 	        sleep(0.1);
+	        printf("finish\n");
 	        break;
 	    }
 
@@ -250,7 +263,7 @@ int main (int argc, char **argv){
     if(L2 == 0){
         shift2 = 1;
     }
-
+   
     Paquet p2 = packetConstructor(1,0,window,0,0,seqnum++,31);
 
 

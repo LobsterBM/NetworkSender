@@ -96,7 +96,7 @@ int main (int argc, char **argv){
 			//display(p);
 			//sprintf(buffSending,"%d",p.Seqnum);
 			printf("found :%d\n",found);	
-			p2 = packetConstructor(2,0,5,0,0,p.Seqnum,4);
+			p2 = packetConstructor(2,0,2,0,0,p.Seqnum,4);
 			char *finalbuff =  malloc(sizeof(char)*11);
 			memcpy(finalbuff,packetGenerator(p,NULL,0),sizeof(char)*11);
 			if(found!=2){
