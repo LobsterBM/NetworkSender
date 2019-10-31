@@ -29,15 +29,6 @@ void packet_creation(void){
 
 }
 
-void packet_buffer_test(void){
-
-    struct Paquet p = packetConstructor(1,0,1,0,5,0,3);
-    char * buffertest = malloc(sizeof(char)*(15) + sizeof("test text"));
-    if(buffertest == NULL){
-        CU_FAIL("Pointer is NULL");
-    }
-    CU_ASSERT(1);
-}
 
 
 int main(){
@@ -53,8 +44,7 @@ int main(){
         return CU_get_error();
     }
 
-    if ((NULL == CU_add_test(pSuite1, "packet initialisation", packet_creation)) ||
-        (NULL == CU_add_test(pSuite1, "packet assignment to buffer", packet_buffer_test))
+    if ((NULL == CU_add_test(pSuite1, "packet initialisation", packet_creation))
         )
     {
         CU_cleanup_registry();

@@ -1,4 +1,4 @@
-/snap/clion/88/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/lobster/Documents/Sender/NetworkSender/Sender
+/snap/clion/92/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/lobster/Documents/Sender/NetworkSender/Sender
 -- Configuring done
 -- Generating done
 -- Build files have been written to: /home/lobster/Documents/Sender/NetworkSender/Sender/cmake-build-debug

@@ -191,7 +191,7 @@ int main (int argc, char **argv){
 					}
 				
 				else if(fds[0].events==1 && fds[0].revents==POLLIN){
-					receivBuffer.content = calloc(528,sizeof(char));//528 = nombre de bytes max d'un paquet
+					receivBuffer.content = realloc( receivBuffer.content,528*sizeof(char));//528 = nombre de bytes max d'un paquet
 					ssize_t reception = recvfrom(sock,receivBuffer.content,sizeof(receivBuffer.content),0,(struct sockaddr *)&peer2_addr,&peer2_len);
 					//int seqnumReceiv = atoi((const char *)receivBuffer);
 					buffToStruct(&receivPacket,receivBuffer);
@@ -212,7 +212,7 @@ int main (int argc, char **argv){
 					 	//printf("vérif seqnumtab:%d et seqnumReceiv:%d\n",seqnumtab[i],seqnumReceiv );
 					    	if(lastAck<receivPacket.Seqnum){//cas normal
 					    		if(seqnumtab[i]<=receivPacket.Seqnum && seqnumtab[i]>lastAck){
-					    		printf("libération du buffer pour le seqnum:%d\n",seqnumtab[i]);
+					    		//printf("libération du buffer pour le seqnum:%d\n",seqnumtab[i]);
 					    		seqnumtab[i]=-1;
 					    		sendingBuffer[i]="\0";
 					    		window++;
@@ -221,7 +221,7 @@ int main (int argc, char **argv){
                             }					    	
                             else{//cas spécial
                             	if(seqnumtab[i]>=0 && (seqnumtab[i]<=receivPacket.Seqnum || seqnumtab[i]>=lastAck)){
-					    		printf("libération du buffer pour le seqnum:%d\n",seqnumtab[i]);
+					    		//printf("libération du buffer pour le seqnum:%d\n",seqnumtab[i]);
 					    		seqnumtab[i]=-1;
 					    		sendingBuffer[i]="\0";
 					    		window++;
